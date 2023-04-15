@@ -1,0 +1,17 @@
+.table-example--pagination {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+.dropdown-menu.show{
+  z-index: 3000;
+}
+.va-dropdown__content{
+  z-index: 2999;
+}
+.number_inequality {
+  max-width: 150px;
+}
