@@ -16,37 +16,40 @@ class AnalyticsService
 
     private array $departments;
 
-    private ?int $companyId;
+    private array $companies;
 
     private EntityManagerInterface $em;
 
     public function __construct(
         \DateTimeImmutable     $valueFrom,
         \DateTimeImmutable     $valueTo,
-        array                  $departments,
         EntityManagerInterface $em
     )
     {
         $this->valueFrom = $valueFrom;
         $this->valueTo = $valueTo;
-        $this->departments = $departments;
-        $this->companyId = null;
+        $this->departments = [];
+        $this->companies = [];
         $this->em = $em;
     }
 
     private function addRoleWhere(string $sql, array $params): array
     {
-        if (null !== $this->companyId) {
-            $sql .= " and c.id = :companyId";
-            $params['companyId'] = $this->companyId;
+        if (count($this->companies) > 0) {
+            $result = '';
+            foreach ($this->companies as $companyId) {
+                $result .= $companyId . ',';
+            }
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            $sql .= " and c.id in (" . $result . ")";
         }
         if (count($this->departments) > 0) {
             $result = '';
             foreach ($this->departments as $departmentId) {
                 $result .= $departmentId . ',';
             }
-            $sql .= " and d.id IN (:departments)";
-            $params['departments'] = mb_substr($result, 0, strlen($result) - 1);
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            $sql .= " and d.id in (" . $result . ")";
         }
         return [$sql, $params];
     }
@@ -55,9 +58,11 @@ class AnalyticsService
      * @throws Exception
      * @throws \Exception
      */
-    public function getDismissal(): array
+    public function getDismissal(array $roleFilters): array
     {
-        $employees = $this->getEmployeesForDismissal($this->valueFrom, $this->valueTo);
+        $this->companies = $roleFilters['companies'];
+        $this->departments = $roleFilters['departments'];
+        $employees = $this->getEmployeesForDismissal($this->valueFrom, $this->valueTo, $roleFilters);
         // общее число увольнений по отделу
         $total = count($employees);
         // средний стаж работы по отделу
@@ -116,11 +121,11 @@ class AnalyticsService
                 e.reason_of_dismissal as reason_of_dismissal,
                 e.category_of_dismissal as category_of_dismissal
              from employee e
-             left join company c
+             inner join company c
                         on c.id = e.company_id
-             left join employee_department ed
+             inner join employee_department ed
                         on e.id = ed.employee_id
-             left join department d
+             inner join department d
                         on d.id = ed.department_id
              where e.status = 3
                 and e.date_of_dismissal >= :startDate
@@ -268,8 +273,10 @@ class AnalyticsService
      * @throws Exception
      * @throws \Exception
      */
-    public function getTurnover(): array
+    public function getTurnover(array $roleFilters): array
     {
+        $this->companies = $roleFilters['companies'];
+        $this->departments = $roleFilters['departments'];
         // число сотрудников
         $countEmployees = $this->getTotalNumberOfEmployees($this->valueTo);
         // список уволенных сотрудников
@@ -334,9 +341,9 @@ class AnalyticsService
         select
             count(distinct e.id) as count
         from employee e
-        left join employee_department ed on e.id = ed.employee_id
-        left join department d on d.id = ed.department_id
-        left join company c on e.company_id = c.id
+        inner join employee_department ed on e.id = ed.employee_id
+        inner join department d on d.id = ed.department_id
+        inner join company c on e.company_id = c.id
         where (e.status != 3 or (e.status = 3 and e.date_of_dismissal > :end))
         ";
         $params = [
@@ -356,9 +363,9 @@ class AnalyticsService
         select
             count(distinct e.id) as count
         from employee e 
-        left join employee_department ed on e.id = ed.employee_id
-        left join department d on d.id = ed.department_id
-        left join company c on e.company_id = c.id
+        inner join employee_department ed on e.id = ed.employee_id
+        inner join department d on d.id = ed.department_id
+        inner join company c on e.company_id = c.id
         where e.date_of_employment >= :start
             and e.date_of_employment <= :end
         ";

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\CompanyRepository;
 use App\Repository\DepartmentRepository;
 use App\Repository\EmployeeRepository;
@@ -23,6 +24,37 @@ class EmployeeController extends AbstractController
         PaginatorInterface $paginator
     ): JsonResponse
     {
+        /**
+         * @var $user User
+         */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse([
+                'code' => Response::HTTP_UNAUTHORIZED,
+                'message' => 'Пользователь не авторизован.',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $roleFilters = [
+            'companies' => [],
+            'departments' => [],
+        ];
+
+        if ($this->isGranted(User::ROLE_HR_MANAGER)) {
+            $companies = $user->getCompanies();
+            foreach ($companies as $company) {
+                $roleFilters['companies'][] = $company->getId();
+            }
+        }
+
+        if ($this->isGranted(User::ROLE_DEPARTMENT_MANAGER)) {
+            $departments = $user->getDepartments();
+            foreach ($departments as $department) {
+                $roleFilters['departments'][] = $department->getId();
+            }
+        }
+
         $page = $request->query->get('page', 0);
         $limit = $request->query->get('limit', 10);
 
@@ -41,7 +73,7 @@ class EmployeeController extends AbstractController
                 JSON_THROW_ON_ERROR
             ) : null;
 
-            $tableData = $repo->table($filter, $sort);
+            $tableData = $repo->table($filter, $sort, $roleFilters);
 
             if ('Все' !== $limit) {
                 // пагинация
@@ -78,10 +110,41 @@ class EmployeeController extends AbstractController
     #[Route('/companies', name: 'app_employees_companies', methods: ['GET'])]
     public function companies(CompanyRepository $repo): JsonResponse
     {
+        /**
+         * @var $user User
+         */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse([
+                'code' => Response::HTTP_UNAUTHORIZED,
+                'message' => 'Пользователь не авторизован.',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $roleFilters = [
+            'companies' => [],
+            'departments' => [],
+        ];
+
+        if ($this->isGranted(User::ROLE_HR_MANAGER)) {
+            $companies = $user->getCompanies();
+            foreach ($companies as $company) {
+                $roleFilters['companies'][] = $company->getId();
+            }
+        }
+
+        if ($this->isGranted(User::ROLE_DEPARTMENT_MANAGER)) {
+            $departments = $user->getDepartments();
+            foreach ($departments as $department) {
+                $roleFilters['departments'][] = $department->getId();
+            }
+        }
+
         try {
             return new JsonResponse([
                 'status' => true,
-                'data' => $repo->names(),
+                'data' => $repo->names($roleFilters),
             ], Response::HTTP_OK);
         } catch (\Doctrine\DBAL\Exception $e) {
             return new JsonResponse([
@@ -94,10 +157,41 @@ class EmployeeController extends AbstractController
     #[Route('/departments', name: 'app_employees_departments', methods: ['GET'])]
     public function departments(DepartmentRepository $repo): JsonResponse
     {
+        /**
+         * @var $user User
+         */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse([
+                'code' => Response::HTTP_UNAUTHORIZED,
+                'message' => 'Пользователь не авторизован.',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $roleFilters = [
+            'companies' => [],
+            'departments' => [],
+        ];
+
+        if ($this->isGranted(User::ROLE_HR_MANAGER)) {
+            $companies = $user->getCompanies();
+            foreach ($companies as $company) {
+                $roleFilters['companies'][] = $company->getId();
+            }
+        }
+
+        if ($this->isGranted(User::ROLE_DEPARTMENT_MANAGER)) {
+            $departments = $user->getDepartments();
+            foreach ($departments as $department) {
+                $roleFilters['departments'][] = $department->getId();
+            }
+        }
+
         try {
             return new JsonResponse([
                 'status' => true,
-                'data' => $repo->names(),
+                'data' => $repo->names($roleFilters),
             ], Response::HTTP_OK);
         } catch (\Doctrine\DBAL\Exception $e) {
             return new JsonResponse([
@@ -110,10 +204,41 @@ class EmployeeController extends AbstractController
     #[Route('/grades', name: 'app_employees_grades', methods: ['GET'])]
     public function grades(EmployeeRepository $repo): JsonResponse
     {
+        /**
+         * @var $user User
+         */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse([
+                'code' => Response::HTTP_UNAUTHORIZED,
+                'message' => 'Пользователь не авторизован.',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $roleFilters = [
+            'companies' => [],
+            'departments' => [],
+        ];
+
+        if ($this->isGranted(User::ROLE_HR_MANAGER)) {
+            $companies = $user->getCompanies();
+            foreach ($companies as $company) {
+                $roleFilters['companies'][] = $company->getId();
+            }
+        }
+
+        if ($this->isGranted(User::ROLE_DEPARTMENT_MANAGER)) {
+            $departments = $user->getDepartments();
+            foreach ($departments as $department) {
+                $roleFilters['departments'][] = $department->getId();
+            }
+        }
+
         try {
             return new JsonResponse([
                 'status' => true,
-                'data' => $repo->grades(),
+                'data' => $repo->grades($roleFilters),
             ], Response::HTTP_OK);
         } catch (\Doctrine\DBAL\Exception $e) {
             return new JsonResponse([
@@ -126,10 +251,41 @@ class EmployeeController extends AbstractController
     #[Route('/competences', name: 'app_employees_competences', methods: ['GET'])]
     public function competences(EmployeeRepository $repo): JsonResponse
     {
+        /**
+         * @var $user User
+         */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse([
+                'code' => Response::HTTP_UNAUTHORIZED,
+                'message' => 'Пользователь не авторизован.',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $roleFilters = [
+            'companies' => [],
+            'departments' => [],
+        ];
+
+        if ($this->isGranted(User::ROLE_HR_MANAGER)) {
+            $companies = $user->getCompanies();
+            foreach ($companies as $company) {
+                $roleFilters['companies'][] = $company->getId();
+            }
+        }
+
+        if ($this->isGranted(User::ROLE_DEPARTMENT_MANAGER)) {
+            $departments = $user->getDepartments();
+            foreach ($departments as $department) {
+                $roleFilters['departments'][] = $department->getId();
+            }
+        }
+
         try {
             return new JsonResponse([
                 'status' => true,
-                'data' => $repo->competences(),
+                'data' => $repo->competences($roleFilters),
             ], Response::HTTP_OK);
         } catch (\Doctrine\DBAL\Exception $e) {
             return new JsonResponse([
@@ -142,10 +298,41 @@ class EmployeeController extends AbstractController
     #[Route('/positions', name: 'app_employees_positions', methods: ['GET'])]
     public function positions(EmployeeRepository $repo): JsonResponse
     {
+        /**
+         * @var $user User
+         */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse([
+                'code' => Response::HTTP_UNAUTHORIZED,
+                'message' => 'Пользователь не авторизован.',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $roleFilters = [
+            'companies' => [],
+            'departments' => [],
+        ];
+
+        if ($this->isGranted(User::ROLE_HR_MANAGER)) {
+            $companies = $user->getCompanies();
+            foreach ($companies as $company) {
+                $roleFilters['companies'][] = $company->getId();
+            }
+        }
+
+        if ($this->isGranted(User::ROLE_DEPARTMENT_MANAGER)) {
+            $departments = $user->getDepartments();
+            foreach ($departments as $department) {
+                $roleFilters['departments'][] = $department->getId();
+            }
+        }
+
         try {
             return new JsonResponse([
                 'status' => true,
-                'data' => $repo->positions(),
+                'data' => $repo->positions($roleFilters),
             ], Response::HTTP_OK);
         } catch (\Doctrine\DBAL\Exception $e) {
             return new JsonResponse([

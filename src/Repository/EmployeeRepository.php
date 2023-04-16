@@ -56,7 +56,7 @@ class EmployeeRepository extends ServiceEntityRepository
     /**
      * @throws Exception
      */
-    public function table(array|null $filter, array|null $sort): array
+    public function table(array|null $filter, array|null $sort, array $roleFilters): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -76,11 +76,11 @@ class EmployeeRepository extends ServiceEntityRepository
             e.reason_of_dismissal as reason_of_dismissal,
             e.category_of_dismissal as category_of_dismissal
             from employee e
-                left join company c 
+                inner join company c 
                     on c.id = e.company_id
-                left join employee_department ed 
+                inner join employee_department ed 
                     on e.id = ed.employee_id
-                left join department d 
+                inner join department d 
                     on d.id = ed.department_id
             ";
         $params = [];
@@ -138,8 +138,32 @@ class EmployeeRepository extends ServiceEntityRepository
                 }
             }
         }
+        if (count($roleFilters['companies']) > 0) {
+            $result = '';
+            foreach ($roleFilters['companies'] as $companyId) {
+                $result .= $companyId . ',';
+            }
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            if (null === $filter || count($filter) === 0) {
+                $sql .= " where c.id in (" . $result . ")";
+            } else {
+                $sql .= " and c.id in (" . $result . ")";
+            }
+        }
+        if (count($roleFilters['departments']) > 0) {
+            $result = '';
+            foreach ($roleFilters['departments'] as $departmentId) {
+                $result .= $departmentId . ',';
+            }
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            if (null === $filter || count($filter) === 0) {
+                $sql .= " where d.id in (" . $result . ")";
+            } else {
+                $sql .= " and d.id in (" . $result . ")";
+            }
+        }
 
-        $sql .= " group by e.id, c.id";
+        $sql .= " group by e.id, d.id, c.id";
 
         if (null !== $sort && 'workExperience' !== $sort['key']) {
             $key = $sort['key'];
@@ -165,7 +189,7 @@ class EmployeeRepository extends ServiceEntityRepository
     /**
      * @throws Exception
      */
-    public function grades(): array
+    public function grades(array $roleFilters): array
     {
         $em = $this->getEntityManager();
         $conn = $em->getConnection();
@@ -173,8 +197,27 @@ class EmployeeRepository extends ServiceEntityRepository
         select 
             distinct 
             e.grade as grade
-        from employee e
-        order by e.grade
+        from employee e            
+            inner join employee_department ed on e.id = ed.employee_id
+            inner join department d on ed.department_id = d.id
+            inner join company c on e.company_id = c.id';
+        if (count($roleFilters['companies']) > 0) {
+            $result = '';
+            foreach ($roleFilters['companies'] as $companyId) {
+                $result .= $companyId . ',';
+            }
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            $sql .= " where c.id in (" . $result . ")";
+        }
+        if (count($roleFilters['departments']) > 0) {
+            $result = '';
+            foreach ($roleFilters['departments'] as $departmentId) {
+                $result .= $departmentId . ',';
+            }
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            $sql .= " where d.id in (" . $result . ")";
+        }
+        $sql .= ' order by e.grade
         ';
         $mapped = [];
         $result = $conn->prepare($sql)->executeQuery([])->fetchAllAssociative();
@@ -190,7 +233,7 @@ class EmployeeRepository extends ServiceEntityRepository
     /**
      * @throws Exception
      */
-    public function positions(): array
+    public function positions(array $roleFilters): array
     {
         $em = $this->getEntityManager();
         $conn = $em->getConnection();
@@ -198,9 +241,27 @@ class EmployeeRepository extends ServiceEntityRepository
         select 
             distinct
             e.position as position
-        from employee e
-        order by e.position
-        ';
+            from employee e            
+            inner join employee_department ed on e.id = ed.employee_id
+            inner join department d on ed.department_id = d.id
+            inner join company c on e.company_id = c.id';
+        if (count($roleFilters['companies']) > 0) {
+            $result = '';
+            foreach ($roleFilters['companies'] as $companyId) {
+                $result .= $companyId . ',';
+            }
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            $sql .= " where c.id in (" . $result . ")";
+        }
+        if (count($roleFilters['departments']) > 0) {
+            $result = '';
+            foreach ($roleFilters['departments'] as $departmentId) {
+                $result .= $departmentId . ',';
+            }
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            $sql .= " where d.id in (" . $result . ")";
+        }
+        $sql .= ' order by e.position';
         $mapped = [];
         $result = $conn->prepare($sql)->executeQuery([])->fetchAllAssociative();
         foreach ($result as $row) {
@@ -215,7 +276,7 @@ class EmployeeRepository extends ServiceEntityRepository
     /**
      * @throws Exception
      */
-    public function competences(): array
+    public function competences(array $roleFilters): array
     {
         $em = $this->getEntityManager();
         $conn = $em->getConnection();
@@ -224,8 +285,27 @@ class EmployeeRepository extends ServiceEntityRepository
             distinct
             e.competence as competence
         from employee e
-        order by e.competence
-        ';
+            inner join employee_department ed on e.id = ed.employee_id
+            inner join department d on ed.department_id = d.id
+            inner join company c on e.company_id = c.id';
+        if (count($roleFilters['companies']) > 0) {
+            $result = '';
+            foreach ($roleFilters['companies'] as $companyId) {
+                $result .= $companyId . ',';
+            }
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            $sql .= " where c.id in (" . $result . ")";
+        }
+        if (count($roleFilters['departments']) > 0) {
+            $result = '';
+            foreach ($roleFilters['departments'] as $departmentId) {
+                $result .= $departmentId . ',';
+            }
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            $sql .= " where d.id in (" . $result . ")";
+        }
+        $sql .= ' order by e.competence';
+
         $mapped = [];
         $result = $conn->prepare($sql)->executeQuery([])->fetchAllAssociative();
         foreach ($result as $row) {

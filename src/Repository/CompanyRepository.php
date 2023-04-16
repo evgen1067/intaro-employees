@@ -56,17 +56,36 @@ class CompanyRepository extends ServiceEntityRepository
     /**
      * @throws Exception
      */
-    public function names(): array
+    public function names(array $roleFilters): array
     {
         $em = $this->getEntityManager();
         $conn = $em->getConnection();
         $sql = '
         select 
+            distinct 
             c.id as id,
             c.name as name
         from company c
-        order by c.name
-        ';
+        inner join employee e on c.id = e.company_id
+        inner join employee_department ed on e.id = ed.employee_id
+        inner join department d on d.id = ed.department_id';
+        if (count($roleFilters['companies']) > 0) {
+            $result = '';
+            foreach ($roleFilters['companies'] as $companyId) {
+                $result .= $companyId . ',';
+            }
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            $sql .= " where c.id in (" . $result . ")";
+        }
+        if (count($roleFilters['departments']) > 0) {
+            $result = '';
+            foreach ($roleFilters['departments'] as $departmentId) {
+                $result .= $departmentId . ',';
+            }
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            $sql .= " where d.id in (" . $result . ")";
+        }
+        $sql .= ' order by c.name';
         $mapped = [];
         $result = $conn->prepare($sql)->executeQuery([])->fetchAllAssociative();
         foreach ($result as $row) {

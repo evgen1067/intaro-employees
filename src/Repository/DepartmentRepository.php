@@ -60,17 +60,36 @@ class DepartmentRepository extends ServiceEntityRepository
     /**
      * @throws Exception
      */
-    public function names(): array
+    public function names(array $roleFilters): array
     {
         $em = $this->getEntityManager();
         $conn = $em->getConnection();
         $sql = '
         select 
+            distinct 
             d.id as id,
             d.name as name
         from department d
-        order by d.name
-        ';
+        inner join employee_department ed on d.id = ed.department_id
+        inner join employee e on ed.employee_id = e.id
+        inner join company c on e.company_id = c.id';
+        if (count($roleFilters['companies']) > 0) {
+            $result = '';
+            foreach ($roleFilters['companies'] as $companyId) {
+                $result .= $companyId . ',';
+            }
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            $sql .= " where c.id in (" . $result . ")";
+        }
+        if (count($roleFilters['departments']) > 0) {
+            $result = '';
+            foreach ($roleFilters['departments'] as $departmentId) {
+                $result .= $departmentId . ',';
+            }
+            $result = mb_substr($result, 0, strlen($result) - 1);
+            $sql .= " where d.id in (" . $result . ")";
+        }
+        $sql .= ' order by d.name';
         $mapped = [];
         $result = $conn->prepare($sql)->executeQuery([])->fetchAllAssociative();
         foreach ($result as $row) {

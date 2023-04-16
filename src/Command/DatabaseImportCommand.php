@@ -37,14 +37,9 @@ class DatabaseImportCommand extends Command
             $this->companyRepository->removeAll();
             $this->departmentRepository->removeAll();
             $departmentsBitrix = $this->bitrixService->getDepartments();
-            $notSaved = [];
             foreach ($departmentsBitrix as $id => $departmentBitrix) {
-                if ('Генеральный директор' !== trim($departmentBitrix)) {
-                    $departmentsBitrix[$id] = new Department(trim($departmentBitrix));
-                    $this->departmentRepository->save($departmentsBitrix[$id], true);
-                } else {
-                    $notSaved[$id] = $id;
-                }
+                $departmentsBitrix[$id] = new Department(trim($departmentBitrix));
+                $this->departmentRepository->save($departmentsBitrix[$id], true);
             }
             $output->writeln("Данные по отделам успешно загружены из Битрикс24");
 
@@ -80,7 +75,7 @@ class DatabaseImportCommand extends Command
                     }
 
                     $usersBitrix[$index]['company'] = $companies[$companyKey];
-                    $usersBitrix[$index]['competence'] = strlen($userEvo['competence']) > 0 ? $userEvo['competence'] : 'не указано';
+                    $usersBitrix[$index]['competence'] = strlen($userEvo['competence']) > 0 ? $userEvo['competence'] : 'Не указано';
                     $usersBitrix[$index]['grade'] = strlen($userEvo['grade']) > 0 ? $userEvo['grade'] : 'не указано';
 
                     $employee = new Employee();
@@ -102,7 +97,7 @@ class DatabaseImportCommand extends Command
                         $employee->addDepartment($departmentsBitrix[$userDepartment]);
                     }
                     # проверки на пустоту отделов и компаний
-                    if (count($usersBitrix[$index]['departments']) === 0) {
+                    if (count($usersBitrix[$index]['departments']) === 0 || !isset($usersBitrix[$index]['departments'])) {
                         $employee->addDepartment($emptyDepartment);
                     }
                     $this->employeeRepository->save($employee, true);

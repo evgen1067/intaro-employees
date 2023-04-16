@@ -24,21 +24,6 @@
             class="w-100"
           />
         </div>
-        <div class="col-2">
-          <va-select
-            v-model="filter.department"
-            label="Отдел"
-            color="#4056A1"
-            class="w-100"
-            :options="departments"
-            text-by="label"
-            value-by="listValueId"
-            clearable
-            searchable
-            max-height="150px"
-            search-placeholder-text="Поиск"
-          />
-        </div>
       </div>
       <div class="row mb-3 col-12">
         <div class="col-2">
@@ -135,9 +120,7 @@ export default {
     filter: {
       from: '',
       to: '',
-      department: '',
     },
-    departments: [],
     dismissals: null,
   }),
   watch: {
@@ -165,8 +148,6 @@ export default {
       this.filter.from = this.filter.from.setMonth(this.filter.from.getMonth() - 12);
       this.filter.from = new Date(this.filter.from);
       this.filter.to = new Date();
-      const result = await EmployeeApi.getDepartments(this.user.token);
-      this.departments = result.data;
     },
     async fetchDismissalData() {
       this.dismissals = await AnalyticsApi.getDismissal(this.user.token, this.clearFilter());
@@ -196,13 +177,6 @@ export default {
       if (flag) {
         this.filter.to = valueTo;
         this.filter.from = valueFrom;
-      }
-      if (this.filter.department) {
-        return {
-          valueFrom: this.filter.from.toLocaleDateString('ru-RU'),
-          valueTo: this.filter.to.toLocaleDateString('ru-RU'),
-          department: this.filter.department,
-        };
       }
       return {
         valueFrom: this.filter.from.toLocaleDateString('ru-RU'),

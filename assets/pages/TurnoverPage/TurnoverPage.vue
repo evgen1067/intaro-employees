@@ -24,21 +24,6 @@
             class="w-100"
           />
         </div>
-        <div class="col-2">
-          <va-select
-            v-model="filter.department"
-            label="Отдел"
-            color="#4056A1"
-            class="w-100"
-            :options="departments"
-            text-by="label"
-            value-by="listValueId"
-            clearable
-            searchable
-            max-height="150px"
-            search-placeholder-text="Поиск"
-          />
-        </div>
       </div>
       <div class="row mb-3">
         <div class="col-2">
@@ -54,12 +39,7 @@
           <info-card :value="turnovers.averageNumber" description="Среднеспис. числ." color="#30B5C8" class="h-100" />
         </div>
         <div class="col-2">
-          <info-card
-            :value="turnovers.turnoverRate"
-            description="Текучесть"
-            color="#F37A48"
-            class="h-100"
-          />
+          <info-card :value="turnovers.turnoverRate" description="Текучесть" color="#F37A48" class="h-100" />
         </div>
       </div>
       <div class="row mb-3">
@@ -139,9 +119,7 @@ export default {
     filter: {
       from: '',
       to: '',
-      department: '',
     },
-    departments: [],
     turnovers: null,
   }),
   inject: {
@@ -174,8 +152,6 @@ export default {
       this.filter.from = this.filter.from.setMonth(this.filter.from.getMonth() - 12);
       this.filter.from = new Date(this.filter.from);
       this.filter.to = new Date();
-      const result = await EmployeeApi.getDepartments(this.user.token);
-      this.departments = result.data;
     },
     async fetchTurnoverData() {
       this.turnovers = await AnalyticsApi.getTurnover(this.user.token, this.clearFilter());
@@ -205,13 +181,6 @@ export default {
       if (flag) {
         this.filter.to = valueTo;
         this.filter.from = valueFrom;
-      }
-      if (this.filter.department) {
-        return {
-          valueFrom: this.filter.from.toLocaleDateString('ru-RU'),
-          valueTo: this.filter.to.toLocaleDateString('ru-RU'),
-          department: this.filter.department,
-        };
       }
       return {
         valueFrom: this.filter.from.toLocaleDateString('ru-RU'),
