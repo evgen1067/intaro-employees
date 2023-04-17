@@ -83,7 +83,7 @@ import { VaButton, VaDataTable, VaPagination } from 'vuestic-ui';
 import { userSymbol } from '../../store';
 
 export default {
-  name: 'EmployeePageV2',
+  name: 'EmployeePage',
   components: { VaDataTable, VaButton, VaPagination, EmployeeFilter, LoadSpinner },
   inject: {
     userState: {

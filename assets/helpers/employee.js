@@ -38,6 +38,29 @@ export function getEmployeeInformation(companies, departments, positions, compet
       label: 'Дата трудоустройства',
     },
     {
+      key: 'status',
+      datatype: 'list',
+      label: 'Статус',
+      listItems: [
+        {
+          label: 'работает',
+          listValueId: 1,
+        },
+        {
+          label: 'декрет',
+          listValueId: 2,
+        },
+        {
+          label: 'уволен',
+          listValueId: 3,
+        },
+        {
+          label: 'не указано',
+          listValueId: 4,
+        },
+      ],
+    },
+    {
       key: 'company',
       datatype: 'list',
       label: 'Компания',
@@ -71,29 +94,6 @@ export function getEmployeeInformation(companies, departments, positions, compet
       key: 'workExperience',
       datatype: 'number',
       label: 'Стаж работы',
-    },
-    {
-      key: 'status',
-      datatype: 'list',
-      label: 'Статус',
-      listItems: [
-        {
-          label: 'работает',
-          listValueId: 1,
-        },
-        {
-          label: 'декрет',
-          listValueId: 2,
-        },
-        {
-          label: 'уволен',
-          listValueId: 3,
-        },
-        {
-          label: 'не указано',
-          listValueId: 4,
-        },
-      ],
     },
     {
       key: 'date_of_dismissal',
@@ -189,6 +189,9 @@ export function getEmployeeInformation(companies, departments, positions, compet
             type: 'list',
             listItems: employeeData[i].listItems,
           };
+    if (employeeData[i].key === 'status') {
+      filter[employeeData[i].key].value = 1;
+    }
   }
 
   return {
