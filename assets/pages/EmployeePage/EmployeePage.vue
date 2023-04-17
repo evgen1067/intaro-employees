@@ -94,8 +94,8 @@ export default {
     loading: true,
     pagination: {
       page: 1,
-      limit: 10,
-      options: [10, 50, 100, 'Все'],
+      limit: 20,
+      options: [20, 50, 100, 'Все'],
     },
     columns: {
       selected: [],
@@ -116,7 +116,7 @@ export default {
       },
     },
     settings: {
-      wrapperSize: 528,
+      wrapperSize: 750,
       itemsSize: 46,
     },
     employee: {},
