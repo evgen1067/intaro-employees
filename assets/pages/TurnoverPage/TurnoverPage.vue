@@ -107,7 +107,7 @@
 <script>
 import { LoadSpinner, InfoCard, AppChart } from '../../ui';
 import { VaCard, VaCardContent, VaDateInput } from 'vuestic-ui';
-import { AnalyticsApi, EmployeeApi } from '../../api';
+import { AnalyticsApi } from '../../api';
 import randomColor from 'randomcolor';
 import { userSymbol } from '../../store';
 
