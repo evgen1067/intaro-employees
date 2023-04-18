@@ -20,4 +20,8 @@ export class HiringApi extends Api {
   static async editRecord(token, id, data) {
     return this.post(`/api/v1/hiring/edit/${id}`, token, data);
   }
+
+  static async deleteRecords(token, data) {
+    return this.post(`/api/v1/hiring/delete`, token, data);
+  }
 }

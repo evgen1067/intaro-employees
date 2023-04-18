@@ -103,14 +103,6 @@ export function getHiringInformation(hrManagers, currentId) {
       tdAlign: 'center',
       thAlign: 'center',
     });
-    defaultItem[hiringPlan[i].key] = hiringPlan[i].datatype === 'string' ? '' : 0;
-    if (hiringPlan[i].key === 'status') {
-      defaultItem[hiringPlan[i].key] = 2;
-    } else if (hiringPlan[i].key === 'urgency') {
-      defaultItem[hiringPlan[i].key] = 1;
-    } else if (hiringPlan[i].key === 'manager_name') {
-      defaultItem[hiringPlan[i].key] = currentId;
-    }
     filter[hiringPlan[i].key] =
       hiringPlan[i].datatype !== 'list'
         ? cloneDeep(filtersList[hiringPlan[i].datatype][0])
@@ -121,8 +113,17 @@ export function getHiringInformation(hrManagers, currentId) {
             type: 'list',
             listItems: hiringPlan[i].listItems,
           };
+    defaultItem[hiringPlan[i].key] = hiringPlan[i].datatype === 'string' ? '' : 0;
+    if (hiringPlan[i].key === 'status') {
+      defaultItem[hiringPlan[i].key] = 2;
+      filter[hiringPlan[i].key].value = 2;
+    } else if (hiringPlan[i].key === 'urgency') {
+      defaultItem[hiringPlan[i].key] = 1;
+    } else if (hiringPlan[i].key === 'manager_name') {
+      defaultItem[hiringPlan[i].key] = currentId;
+      filter[hiringPlan[i].key].value = currentId;
+    }
   }
-  columns.push({ key: 'actions', width: 80, label: 'Действия', tdAlign: 'center', thAlign: 'center'});
   return {
     columns: columns,
     filter: filter,

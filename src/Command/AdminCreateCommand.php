@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\User;
+use App\Repository\CompanyRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -16,6 +17,7 @@ class AdminCreateCommand extends Command
     public function __construct(
         private UserPasswordHasherInterface $hasher,
         private UserRepository $repo,
+        private CompanyRepository $companyRepository,
         string $name = null
     ) {
         parent::__construct($name);
@@ -24,6 +26,10 @@ class AdminCreateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $user = new User();
+        $companies = $this->companyRepository->findAll();
+        foreach ($companies as $company) {
+            $user->addCompany($company);
+        }
         $user
             ->setName($_ENV['ADMIN_NAME'])
             ->setRoles(['ROLE_SUPER_ADMIN'])

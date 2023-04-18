@@ -12,7 +12,7 @@ export const appRoutes = {
     name: 'dismissal',
     title: 'Увольнения',
     meta: {
-      icon: 'badge',
+      icon: 'insights',
     },
   },
   turnover: {
@@ -28,7 +28,7 @@ export const appRoutes = {
     name: 'hiring',
     title: 'Планы по найму',
     meta: {
-      icon: 'bar_chart',
+      icon: 'people_alt',
     },
   },
 };
