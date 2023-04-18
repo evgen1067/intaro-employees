@@ -42,26 +42,26 @@ class DatabaseImportCommand extends Command
                 $departmentsBitrix[$id] = new Department(trim($departmentBitrix));
                 $this->departmentRepository->save($departmentsBitrix[$id], true);
             }
-            $output->writeln("Данные по отделам успешно загружены из Битрикс24");
+            $output->writeln('Данные по отделам успешно загружены из Битрикс24');
 
             $emptyDepartment = new Department('не указано');
             $this->departmentRepository->save($emptyDepartment, true);
 
             $usersBitrix = $this->bitrixService->getUsers();
-            $output->writeln("Данные по сотрудникам успешно загружены из Битрикс24");
-            $output->writeln("Сотрудников получено из Битрикс24: " . count($usersBitrix));
+            $output->writeln('Данные по сотрудникам успешно загружены из Битрикс24');
+            $output->writeln('Сотрудников получено из Битрикс24: '.count($usersBitrix));
 
             $usersEvolution = $this->evolutionService->getUsers($token);
-            $output->writeln("Данные по сотрудникам успешно загружены из Evolution");
-            $output->writeln("Сотрудников получено из Evolution: " . count($usersEvolution));
+            $output->writeln('Данные по сотрудникам успешно загружены из Evolution');
+            $output->writeln('Сотрудников получено из Evolution: '.count($usersEvolution));
 
             $count = 0;
             foreach ($usersEvolution as $key => $userEvo) {
                 $nameParts = explode(' ', $userEvo['title']);
-                $usersEvolution[$key]['MAP_NAME'] = $nameParts[0] . ' ' . $nameParts[1];
+                $usersEvolution[$key]['MAP_NAME'] = $nameParts[0].' '.$nameParts[1];
                 $index = array_search($usersEvolution[$key]['MAP_NAME'], array_column($usersBitrix, 'MAP_NAME'));
                 if (false !== $index) {
-                    $count++;
+                    ++$count;
                     if (strlen($usersBitrix[$index]['name']) < strlen($userEvo['title'])) {
                         $usersBitrix[$index]['name'] = $userEvo['title'];
                     }
@@ -94,17 +94,20 @@ class DatabaseImportCommand extends Command
                         $employee->setDateOfDismissal($usersBitrix[$index]['dateOfDismissal']);
                     }
                     foreach ($usersBitrix[$index]['departments'] as $userDepartment) {
-                        if (isset($notSaved[$userDepartment])) continue;
+                        if (isset($notSaved[$userDepartment])) {
+                            continue;
+                        }
                         $employee->addDepartment($departmentsBitrix[$userDepartment]);
                     }
-                    # проверки на пустоту отделов и компаний
-                    if (count($usersBitrix[$index]['departments']) === 0 || !isset($usersBitrix[$index]['departments'])) {
+                    // проверки на пустоту отделов и компаний
+                    if (0 === count($usersBitrix[$index]['departments']) || !isset($usersBitrix[$index]['departments'])) {
                         $employee->addDepartment($emptyDepartment);
                     }
                     $this->employeeRepository->save($employee, true);
                 }
             }
-            $output->writeln("В БД загружены данные по " . $count . " сотрудникам");
+            $output->writeln('В БД загружены данные по '.$count.' сотрудникам');
+
             return Command::SUCCESS;
         } catch (ApiException|\JsonException|\Exception $e) {
             $output->writeln($e->getMessage());

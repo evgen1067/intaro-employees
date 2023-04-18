@@ -2,19 +2,19 @@
 
 namespace App\Services;
 
-use App\Entity\EvolutionEmployee;
 use App\Exception\ApiException;
 
 class EvolutionService
 {
-    public function __construct(
-        private ApiService $apiService,
-    ) {}
-
     private array $methods = [
         'employee' => 'employee',
         'auth' => 'auth',
     ];
+
+    public function __construct(
+        private ApiService $apiService,
+    ) {
+    }
 
     /**
      * @throws ApiException
@@ -34,6 +34,7 @@ class EvolutionService
         foreach ($data as $key => $item) {
             $data[$key]['company'] = strlen($item['company']) > 0 ? $item['company'] : 'не указано';
         }
+
         return $data;
     }
 
@@ -55,11 +56,12 @@ class EvolutionService
         if (isset($jsonResponse['status'])) {
             throw new ApiException($jsonResponse['status']);
         }
+
         return $jsonResponse['token'];
     }
 
     private function buildUrl(string $method, array|null $params): string
     {
-        return $_ENV['EVOLUTION_URL'] . '/' . $method . (null !== $params ? ('?' . http_build_query($params)) : '');
+        return $_ENV['EVOLUTION_URL'].'/'.$method.(null !== $params ? ('?'.http_build_query($params)) : '');
     }
 }

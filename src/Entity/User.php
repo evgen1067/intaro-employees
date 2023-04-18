@@ -13,6 +13,14 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Table(name: '`manager_user`')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
+
+    public const ROLE_TOP_MANAGER = 'ROLE_TOP_MANAGER';
+
+    public const ROLE_HR_MANAGER = 'ROLE_HR_MANAGER';
+
+    public const ROLE_DEPARTMENT_MANAGER = 'ROLE_DEPARTMENT_MANAGER';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -48,14 +56,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->companies = new ArrayCollection();
         $this->hiringPlans = new ArrayCollection();
     }
-
-    public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
-
-    public const ROLE_TOP_MANAGER = 'ROLE_TOP_MANAGER';
-
-    public const ROLE_HR_MANAGER = 'ROLE_HR_MANAGER';
-
-    public const ROLE_DEPARTMENT_MANAGER = 'ROLE_DEPARTMENT_MANAGER';
 
     public function getId(): ?int
     {

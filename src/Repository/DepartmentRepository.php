@@ -10,8 +10,8 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<Department>
  *
- * @method Department|null find($id, $lockMode = null, $lockVersion = null)
- * @method Department|null findOneBy(array $criteria, array $orderBy = null)
+ * @method null|Department find($id, $lockMode = null, $lockVersion = null)
+ * @method null|Department findOneBy(array $criteria, array $orderBy = null)
  * @method Department[]    findAll()
  * @method Department[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
@@ -76,18 +76,18 @@ class DepartmentRepository extends ServiceEntityRepository
         if (count($roleFilters['companies']) > 0) {
             $result = '';
             foreach ($roleFilters['companies'] as $companyId) {
-                $result .= $companyId . ',';
+                $result .= $companyId.',';
             }
             $result = mb_substr($result, 0, strlen($result) - 1);
-            $sql .= " where c.id in (" . $result . ")";
+            $sql .= ' where c.id in ('.$result.')';
         }
         if (count($roleFilters['departments']) > 0) {
             $result = '';
             foreach ($roleFilters['departments'] as $departmentId) {
-                $result .= $departmentId . ',';
+                $result .= $departmentId.',';
             }
             $result = mb_substr($result, 0, strlen($result) - 1);
-            $sql .= " where d.id in (" . $result . ")";
+            $sql .= ' where d.id in ('.$result.')';
         }
         $sql .= ' order by d.name';
         $mapped = [];
@@ -95,9 +95,10 @@ class DepartmentRepository extends ServiceEntityRepository
         foreach ($result as $row) {
             $mapped[] = [
                 'listValueId' => $row['id'],
-                'label' => $row['name']
+                'label' => $row['name'],
             ];
         }
+
         return $mapped;
     }
 }

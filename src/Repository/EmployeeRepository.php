@@ -10,8 +10,8 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<Employee>
  *
- * @method Employee|null find($id, $lockMode = null, $lockVersion = null)
- * @method Employee|null findOneBy(array $criteria, array $orderBy = null)
+ * @method null|Employee find($id, $lockMode = null, $lockVersion = null)
+ * @method null|Employee findOneBy(array $criteria, array $orderBy = null)
  * @method Employee[]    findAll()
  * @method Employee[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
@@ -89,51 +89,51 @@ class EmployeeRepository extends ServiceEntityRepository
                 if (isset($item['type'])) {
                     $type = $item['type'];
                     if ('text_contains' === $type) {
-                        $sql .= " and lower(e.".$key.") like :param_".$key;
-                        $params[":param_".$key] = "%".mb_strtolower($item['value'])."%";
+                        $sql .= ' and lower(e.'.$key.') like :param_'.$key;
+                        $params[':param_'.$key] = '%'.mb_strtolower($item['value']).'%';
                     }
 
                     if ('text_not_contains' === $type) {
-                        $sql .= " and lower(e.".$key.") not like :param_".$key;
-                        $params[":param_".$key] = "%".mb_strtolower($item['value'])."%";
+                        $sql .= ' and lower(e.'.$key.') not like :param_'.$key;
+                        $params[':param_'.$key] = '%'.mb_strtolower($item['value']).'%';
                     }
 
                     if ('text_start' === $type) {
-                        $sql .= " and lower(e.".$key.") like :param_".$key;
-                        $params[":param_".$key] = mb_strtolower($item['value'])."%";
+                        $sql .= ' and lower(e.'.$key.') like :param_'.$key;
+                        $params[':param_'.$key] = mb_strtolower($item['value']).'%';
                     }
 
                     if ('text_end' === $type) {
-                        $sql .= " and lower(e.".$key.") like :param_".$key;
-                        $params[":param_".$key] = "%".mb_strtolower($item['value']);
+                        $sql .= ' and lower(e.'.$key.') like :param_'.$key;
+                        $params[':param_'.$key] = '%'.mb_strtolower($item['value']);
                     }
 
                     if (('text_accuracy' === $type || 'list' === $type)) {
-                        if ($key === 'departments') {
-                            $sql .= " and d.id = :param_".$key;
-                            $params[":param_".$key] = $item['value'];
-                        } else if ($key === 'company') {
-                            $sql .= " and c.id = :param_".$key;
-                            $params[":param_".$key] = $item['value'];
+                        if ('departments' === $key) {
+                            $sql .= ' and d.id = :param_'.$key;
+                            $params[':param_'.$key] = $item['value'];
+                        } elseif ('company' === $key) {
+                            $sql .= ' and c.id = :param_'.$key;
+                            $params[':param_'.$key] = $item['value'];
                         } else {
-                            $sql .= " and e.".$key." = :param_".$key;
-                            $params[":param_".$key] = $item['value'];
+                            $sql .= ' and e.'.$key.' = :param_'.$key;
+                            $params[':param_'.$key] = $item['value'];
                         }
                     }
 
                     if ('date_day' === $type) {
-                        $sql .= " and e.".$key." = :param_".$key;
-                        $params[":param_".$key] = \DateTimeImmutable::createFromFormat('d.m.Y', $item['value'])->format('Y-m-d');
+                        $sql .= ' and e.'.$key.' = :param_'.$key;
+                        $params[':param_'.$key] = \DateTimeImmutable::createFromFormat('d.m.Y', $item['value'])->format('Y-m-d');
                     }
 
                     if ('date_before' === $type) {
-                        $sql .= " and e.".$key." < :param_".$key;
-                        $params[":param_".$key] = \DateTimeImmutable::createFromFormat('d.m.Y', $item['value'])->format('Y-m-d');
+                        $sql .= ' and e.'.$key.' < :param_'.$key;
+                        $params[':param_'.$key] = \DateTimeImmutable::createFromFormat('d.m.Y', $item['value'])->format('Y-m-d');
                     }
 
                     if ('date_after' === $type) {
-                        $sql .= " and e.".$key." > :param_".$key;
-                        $params[":param_".$key] = \DateTimeImmutable::createFromFormat('d.m.Y', $item['value'])->format('Y-m-d');
+                        $sql .= ' and e.'.$key.' > :param_'.$key;
+                        $params[':param_'.$key] = \DateTimeImmutable::createFromFormat('d.m.Y', $item['value'])->format('Y-m-d');
                     }
                 }
             }
@@ -141,38 +141,38 @@ class EmployeeRepository extends ServiceEntityRepository
         if (count($roleFilters['companies']) > 0) {
             $result = '';
             foreach ($roleFilters['companies'] as $companyId) {
-                $result .= $companyId . ',';
+                $result .= $companyId.',';
             }
             $result = mb_substr($result, 0, strlen($result) - 1);
-            if (null === $filter || count($filter) === 0) {
-                $sql .= " where c.id in (" . $result . ")";
+            if (null === $filter || 0 === count($filter)) {
+                $sql .= ' where c.id in ('.$result.')';
             } else {
-                $sql .= " and c.id in (" . $result . ")";
+                $sql .= ' and c.id in ('.$result.')';
             }
         }
         if (count($roleFilters['departments']) > 0) {
             $result = '';
             foreach ($roleFilters['departments'] as $departmentId) {
-                $result .= $departmentId . ',';
+                $result .= $departmentId.',';
             }
             $result = mb_substr($result, 0, strlen($result) - 1);
-            if (null === $filter || count($filter) === 0) {
-                $sql .= " where d.id in (" . $result . ")";
+            if (null === $filter || 0 === count($filter)) {
+                $sql .= ' where d.id in ('.$result.')';
             } else {
-                $sql .= " and d.id in (" . $result . ")";
+                $sql .= ' and d.id in ('.$result.')';
             }
         }
 
-        $sql .= " group by e.id, d.id, c.id";
+        $sql .= ' group by e.id, d.id, c.id';
 
         if (null !== $sort && 'workExperience' !== $sort['key']) {
             $key = $sort['key'];
-            if ($key === 'departments') {
-                $sql .= " order by d.name " . $sort['value'];
-            } else if ($key === 'company') {
-                $sql .= " order by c.name " . $sort['value'];
+            if ('departments' === $key) {
+                $sql .= ' order by d.name '.$sort['value'];
+            } elseif ('company' === $key) {
+                $sql .= ' order by c.name '.$sort['value'];
             } else {
-                $sql .= " order by e." . $key . " " . $sort['value'];
+                $sql .= ' order by e.'.$key.' '.$sort['value'];
             }
         }
 
@@ -204,18 +204,18 @@ class EmployeeRepository extends ServiceEntityRepository
         if (count($roleFilters['companies']) > 0) {
             $result = '';
             foreach ($roleFilters['companies'] as $companyId) {
-                $result .= $companyId . ',';
+                $result .= $companyId.',';
             }
             $result = mb_substr($result, 0, strlen($result) - 1);
-            $sql .= " where c.id in (" . $result . ")";
+            $sql .= ' where c.id in ('.$result.')';
         }
         if (count($roleFilters['departments']) > 0) {
             $result = '';
             foreach ($roleFilters['departments'] as $departmentId) {
-                $result .= $departmentId . ',';
+                $result .= $departmentId.',';
             }
             $result = mb_substr($result, 0, strlen($result) - 1);
-            $sql .= " where d.id in (" . $result . ")";
+            $sql .= ' where d.id in ('.$result.')';
         }
         $sql .= ' order by e.grade
         ';
@@ -224,9 +224,10 @@ class EmployeeRepository extends ServiceEntityRepository
         foreach ($result as $row) {
             $mapped[] = [
                 'listValueId' => $row['grade'],
-                'label' => $row['grade']
+                'label' => $row['grade'],
             ];
         }
+
         return $mapped;
     }
 
@@ -248,18 +249,18 @@ class EmployeeRepository extends ServiceEntityRepository
         if (count($roleFilters['companies']) > 0) {
             $result = '';
             foreach ($roleFilters['companies'] as $companyId) {
-                $result .= $companyId . ',';
+                $result .= $companyId.',';
             }
             $result = mb_substr($result, 0, strlen($result) - 1);
-            $sql .= " where c.id in (" . $result . ")";
+            $sql .= ' where c.id in ('.$result.')';
         }
         if (count($roleFilters['departments']) > 0) {
             $result = '';
             foreach ($roleFilters['departments'] as $departmentId) {
-                $result .= $departmentId . ',';
+                $result .= $departmentId.',';
             }
             $result = mb_substr($result, 0, strlen($result) - 1);
-            $sql .= " where d.id in (" . $result . ")";
+            $sql .= ' where d.id in ('.$result.')';
         }
         $sql .= ' order by e.position';
         $mapped = [];
@@ -267,9 +268,10 @@ class EmployeeRepository extends ServiceEntityRepository
         foreach ($result as $row) {
             $mapped[] = [
                 'listValueId' => $row['position'],
-                'label' => $row['position']
+                'label' => $row['position'],
             ];
         }
+
         return $mapped;
     }
 
@@ -291,18 +293,18 @@ class EmployeeRepository extends ServiceEntityRepository
         if (count($roleFilters['companies']) > 0) {
             $result = '';
             foreach ($roleFilters['companies'] as $companyId) {
-                $result .= $companyId . ',';
+                $result .= $companyId.',';
             }
             $result = mb_substr($result, 0, strlen($result) - 1);
-            $sql .= " where c.id in (" . $result . ")";
+            $sql .= ' where c.id in ('.$result.')';
         }
         if (count($roleFilters['departments']) > 0) {
             $result = '';
             foreach ($roleFilters['departments'] as $departmentId) {
-                $result .= $departmentId . ',';
+                $result .= $departmentId.',';
             }
             $result = mb_substr($result, 0, strlen($result) - 1);
-            $sql .= " where d.id in (" . $result . ")";
+            $sql .= ' where d.id in ('.$result.')';
         }
         $sql .= ' order by e.competence';
 
@@ -311,9 +313,10 @@ class EmployeeRepository extends ServiceEntityRepository
         foreach ($result as $row) {
             $mapped[] = [
                 'listValueId' => $row['competence'],
-                'label' => $row['competence']
+                'label' => $row['competence'],
             ];
         }
+
         return $mapped;
     }
 }

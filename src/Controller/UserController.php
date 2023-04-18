@@ -79,10 +79,11 @@ class UserController extends AbstractController
                 ->setName($userRequest['name'])
                 ->setRoles([$userRequest['roles']]);
             $password = $hasher->hashPassword(
-                $user, $userRequest['password']
+                $user,
+                $userRequest['password']
             );
             $user->setPassword($password);
-            if ($userRequest['roles'] === User::ROLE_HR_MANAGER) {
+            if (User::ROLE_HR_MANAGER === $userRequest['roles']) {
                 $companies = $userRequest['companies'];
                 foreach ($companies as $companyId) {
                     $company = $companyRepo->find($companyId);
@@ -90,7 +91,7 @@ class UserController extends AbstractController
                         $user->addCompany($company);
                     }
                 }
-            } else if ($userRequest['roles'] === User::ROLE_DEPARTMENT_MANAGER) {
+            } elseif (User::ROLE_DEPARTMENT_MANAGER === $userRequest['roles']) {
                 $departments = $userRequest['departments'];
                 foreach ($departments as $departmentId) {
                     $department = $departmentRepo->find($departmentId);
@@ -100,6 +101,7 @@ class UserController extends AbstractController
                 }
             }
             $repo->save($user, true);
+
             return new JsonResponse([
                 'code' => Response::HTTP_CREATED,
                 'message' => 'Пользователь успешно создан.',

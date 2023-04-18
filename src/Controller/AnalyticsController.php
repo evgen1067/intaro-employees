@@ -53,12 +53,13 @@ class AnalyticsController extends AbstractController
         $valueTo = $request->query->get('valueTo');
         $valueTo = \DateTimeImmutable::createFromFormat('d.m.Y', $valueTo);
         $analytics = new AnalyticsService($valueFrom, $valueTo, $em);
+
         try {
             return new JsonResponse($analytics->getDismissal($roleFilters), Response::HTTP_OK);
         } catch (Exception|\Exception $e) {
             return new JsonResponse([
                 'status' => false,
-                'data' => $e->getMessage()
+                'data' => $e->getMessage(),
             ], Response::HTTP_OK);
         }
     }
@@ -101,12 +102,13 @@ class AnalyticsController extends AbstractController
         $valueTo = $request->query->get('valueTo');
         $valueTo = \DateTimeImmutable::createFromFormat('d.m.Y', $valueTo);
         $analytics = new AnalyticsService($valueFrom, $valueTo, $em);
+
         try {
             return new JsonResponse($analytics->getTurnover($roleFilters), Response::HTTP_OK);
         } catch (Exception|\Exception $e) {
             return new JsonResponse([
                 'status' => false,
-                'data' => $e->getMessage()
+                'data' => $e->getMessage(),
             ], Response::HTTP_OK);
         }
     }

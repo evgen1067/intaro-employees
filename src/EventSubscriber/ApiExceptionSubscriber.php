@@ -19,7 +19,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
         }
         $jsonResponse = new JsonResponse([
             'status' => false,
-            'data' => $code.'. '.$exception->getMessage()
+            'data' => $code.'. '.$exception->getMessage(),
         ], Response::HTTP_OK);
         $event->setResponse($jsonResponse);
     }

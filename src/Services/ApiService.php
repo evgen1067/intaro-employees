@@ -11,9 +11,9 @@ class ApiService
      */
     public function get(
         string $route,
-               $getParams = null,
-               $headers = null,
-               $exceptionMessage = 'Сервис временно недоступен.'
+        $getParams = null,
+        $headers = null,
+        $exceptionMessage = 'Сервис временно недоступен.'
     ): bool|string {
         $route = $route.((null !== $getParams) ? '?'.http_build_query($getParams) : '');
         $options = [
@@ -37,9 +37,9 @@ class ApiService
      */
     public function post(
         string $route,
-               $postParams = null,
-               $headers = null,
-               $exceptionMessage = 'Сервис временно недоступен.'
+        $postParams = null,
+        $headers = null,
+        $exceptionMessage = 'Сервис временно недоступен.'
     ): bool|string {
         $options = [
             CURLOPT_POST => true,

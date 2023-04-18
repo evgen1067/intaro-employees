@@ -7,6 +7,11 @@ use JMS\Serializer\SerializerInterface;
 
 class BitrixService
 {
+    private array $methods = [
+        'user' => 'user.search',
+        'departments' => 'department.get',
+    ];
+
     public function __construct(
         private ApiService $apiService,
         SerializerInterface $serializer,
@@ -14,15 +19,10 @@ class BitrixService
         $this->serializer = $serializer;
     }
 
-    private array $methods = [
-        'user' => 'user.search',
-        'departments' => 'department.get',
-    ];
-
     /**
-    * @throws ApiException
-    * @throws \JsonException
-    */
+     * @throws ApiException
+     * @throws \JsonException
+     */
     public function getDepartments(): array
     {
         $departmentList = [];
@@ -30,6 +30,7 @@ class BitrixService
         foreach ($departmentsBitrix as $d) {
             $departmentList[$d['ID']] = $d['NAME'];
         }
+
         return $departmentList;
     }
 
@@ -54,9 +55,10 @@ class BitrixService
                 'reasonOfDismissal' => null,
                 'categoryOfDismissal' => null,
                 'departments' => $u['UF_DEPARTMENT'],
-                'MAP_NAME' => $u['LAST_NAME'] . ' ' . $u['NAME'],
+                'MAP_NAME' => $u['LAST_NAME'].' '.$u['NAME'],
             ];
         }
+
         return $usersList;
     }
 

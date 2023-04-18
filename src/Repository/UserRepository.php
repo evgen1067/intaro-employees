@@ -13,8 +13,8 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 /**
  * @extends ServiceEntityRepository<User>
  *
- * @method User|null find($id, $lockMode = null, $lockVersion = null)
- * @method User|null findOneBy(array $criteria, array $orderBy = null)
+ * @method null|User find($id, $lockMode = null, $lockVersion = null)
+ * @method null|User findOneBy(array $criteria, array $orderBy = null)
  * @method User[]    findAll()
  * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
@@ -60,25 +60,26 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     /**
      * @throws Exception
      */
-    public function names():array
+    public function names(): array
     {
         $em = $this->getEntityManager();
         $conn = $em->getConnection();
-        $sql = "
+        $sql = '
         select 
             distinct 
             u.id as id,
             u.name as name
         from manager_user u
         order by u.name
-        ";
+        ';
         $result = $conn->prepare($sql)->executeQuery([])->fetchAllAssociative();
         foreach ($result as $row) {
             $mapped[] = [
                 'listValueId' => $row['id'],
-                'label' => $row['name']
+                'label' => $row['name'],
             ];
         }
+
         return $mapped;
     }
 }

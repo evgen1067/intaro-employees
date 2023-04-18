@@ -6,7 +6,6 @@ use App\Entity\User;
 use App\Repository\CompanyRepository;
 use App\Repository\DepartmentRepository;
 use App\Repository\EmployeeRepository;
-use Exception;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,8 +21,7 @@ class EmployeeController extends AbstractController
         Request $request,
         EmployeeRepository $repo,
         PaginatorInterface $paginator
-    ): JsonResponse
-    {
+    ): JsonResponse {
         /**
          * @var $user User
          */
@@ -99,10 +97,10 @@ class EmployeeController extends AbstractController
                 'totalCount' => $tableData['totalCount'],
                 'data' => $tableData['items'],
             ], Response::HTTP_OK);
-        } catch (Exception | \JsonException $e) {
+        } catch (\Exception|\JsonException $e) {
             return new JsonResponse([
                 'status' => false,
-                'data' => $e->getMessage()
+                'data' => $e->getMessage(),
             ], Response::HTTP_OK);
         }
     }
@@ -149,7 +147,7 @@ class EmployeeController extends AbstractController
         } catch (\Doctrine\DBAL\Exception $e) {
             return new JsonResponse([
                 'status' => false,
-                'data' => $e->getMessage()
+                'data' => $e->getMessage(),
             ], Response::HTTP_OK);
         }
     }
@@ -196,7 +194,7 @@ class EmployeeController extends AbstractController
         } catch (\Doctrine\DBAL\Exception $e) {
             return new JsonResponse([
                 'status' => false,
-                'data' => $e->getMessage()
+                'data' => $e->getMessage(),
             ], Response::HTTP_OK);
         }
     }
@@ -243,7 +241,7 @@ class EmployeeController extends AbstractController
         } catch (\Doctrine\DBAL\Exception $e) {
             return new JsonResponse([
                 'status' => false,
-                'data' => $e->getMessage()
+                'data' => $e->getMessage(),
             ], Response::HTTP_OK);
         }
     }
@@ -290,7 +288,7 @@ class EmployeeController extends AbstractController
         } catch (\Doctrine\DBAL\Exception $e) {
             return new JsonResponse([
                 'status' => false,
-                'data' => $e->getMessage()
+                'data' => $e->getMessage(),
             ], Response::HTTP_OK);
         }
     }
@@ -337,7 +335,7 @@ class EmployeeController extends AbstractController
         } catch (\Doctrine\DBAL\Exception $e) {
             return new JsonResponse([
                 'status' => false,
-                'data' => $e->getMessage()
+                'data' => $e->getMessage(),
             ], Response::HTTP_OK);
         }
     }

@@ -24,9 +24,10 @@ class AuthTestCommand extends Command
         try {
             $token = $this->evolutionService->auth();
             $output->writeln($token);
-        } catch (ApiException | \JsonException $e) {
+        } catch (ApiException|\JsonException $e) {
             $output->writeln($e->getMessage());
         }
+
         return 0;
     }
 }

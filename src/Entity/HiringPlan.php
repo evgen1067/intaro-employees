@@ -11,10 +11,25 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: HiringPlanRepository::class)]
 class HiringPlan
 {
+    public const STATUS_TYPES = [
+        1 => 'Найм закрыт',
+        2 => 'В процессе найма',
+    ];
+
+    public const URGENCY_TYPES = [
+        1 => 'низкая',
+        2 => 'средняя',
+        3 => 'высокая',
+        4 => 'приоритетная',
+        5 => 'холд',
+        6 => 'до лучшего',
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
     #[ORM\Column(length: 512)]
     private ?string $position = null;
 
@@ -41,20 +56,6 @@ class HiringPlan
 
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $urgency = null;
-
-    public const STATUS_TYPES = [
-        1 => 'Найм закрыт',
-        2 => 'В процессе найма',
-    ];
-
-    public const URGENCY_TYPES = [
-        1 => 'низкая',
-        2 => 'средняя',
-        3 => 'высокая',
-        4 => 'приоритетная',
-        5 => 'холд',
-        6 => 'до лучшего',
-    ];
 
     public function __construct()
     {
@@ -192,6 +193,7 @@ class HiringPlan
             $sqlArray[$sqlKey]['status'] = self::STATUS_TYPES[$sqlRow['status']];
             $sqlArray[$sqlKey]['urgency'] = self::URGENCY_TYPES[$sqlRow['urgency']];
         }
+
         return $sqlArray;
     }
 

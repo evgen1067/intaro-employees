@@ -37,6 +37,7 @@ class AdminCreateCommand extends Command
         $password = $this->hasher->hashPassword($user, $_ENV['ADMIN_PASSWORD']);
         $user->setPassword($password);
         $this->repo->save($user, true);
+
         return Command::SUCCESS;
     }
 }

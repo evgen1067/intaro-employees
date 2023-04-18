@@ -11,6 +11,68 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
 class Employee
 {
+    public const GENDER_TYPES = [
+        1 => 'мужской',
+        2 => 'женский',
+        3 => 'не указано',
+    ];
+
+    public const STATUS_TYPES = [
+        1 => 'работает',
+        2 => 'декрет',
+        3 => 'уволен',
+        4 => 'не указано',
+    ];
+
+    public const REASON_TYPES = [
+        1 => 'не пройден испытательный срок',
+        2 => 'проблемы с дисциплиной',
+        3 => 'не справлялся с поставленными задачами',
+        4 => 'сокращение',
+        5 => 'предложение о работе с высокой заработной платой',
+        6 => 'потерял ценность',
+        7 => 'не видит для себя профессионального развития',
+        8 => 'хочет сменить должность/направление',
+        9 => 'выгорание',
+        10 => 'релокация',
+    ];
+
+    public const CATEGORY_TYPE = [
+        1 => 'добровольная',
+        2 => 'принудительная',
+        3 => 'нежелательная',
+    ];
+
+    public const REVERSE_STATUS_TYPES = [
+        'работает' => 1,
+        'декрет' => 2,
+        'уволен' => 3,
+    ];
+
+    public const REVERSE_REASON_TYPES = [
+        'не пройден испытательный срок' => 1,
+        'проблемы с дисциплиной' => 2,
+        'не справлялся с поставленными задачами' => 3,
+        'сокращение' => 4,
+        'предложение о работе с высокой заработной платой' => 5,
+        'потерял ценность' => 6,
+        'не видит для себя профессионального развития' => 7,
+        'хочет сменить должность/направление' => 8,
+        'выгорание' => 9,
+        'релокация' => 10,
+    ];
+
+    public const REVERSE_CATEGORY_TYPE = [
+        'добровольная' => 1,
+        'принудительная' => 2,
+        'нежелательная' => 3,
+    ];
+
+    public const REVERSE_GENDER_TYPES = [
+        'мужской' => 1,
+        'женский' => 2,
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -234,68 +296,6 @@ class Employee
         return $this;
     }
 
-    public const GENDER_TYPES = [
-        1 => 'мужской',
-        2 => 'женский',
-        3 => 'не указано',
-    ];
-
-    public const STATUS_TYPES = [
-        1 => 'работает',
-        2 => 'декрет',
-        3 => 'уволен',
-        4 => 'не указано',
-    ];
-
-    public const REASON_TYPES = [
-        1 => 'не пройден испытательный срок',
-        2 => 'проблемы с дисциплиной',
-        3 => 'не справлялся с поставленными задачами',
-        4 => 'сокращение',
-        5 => 'предложение о работе с высокой заработной платой',
-        6 => 'потерял ценность',
-        7 => 'не видит для себя профессионального развития',
-        8 => 'хочет сменить должность/направление',
-        9 => 'выгорание',
-        10 => 'релокация',
-    ];
-
-    public const CATEGORY_TYPE = [
-        1 => 'добровольная',
-        2 => 'принудительная',
-        3 => 'нежелательная',
-    ];
-
-    public const REVERSE_STATUS_TYPES = [
-        'работает' => 1,
-        'декрет' => 2,
-        'уволен' => 3,
-    ];
-
-    public const REVERSE_REASON_TYPES = [
-        'не пройден испытательный срок' => 1,
-        'проблемы с дисциплиной' => 2,
-        'не справлялся с поставленными задачами' => 3,
-        'сокращение' => 4,
-        'предложение о работе с высокой заработной платой' => 5,
-        'потерял ценность' => 6,
-        'не видит для себя профессионального развития' => 7,
-        'хочет сменить должность/направление' => 8,
-        'выгорание' => 9,
-        'релокация' => 10,
-    ];
-
-    public const REVERSE_CATEGORY_TYPE = [
-        'добровольная' => 1,
-        'принудительная' => 2,
-        'нежелательная' => 3,
-    ];
-
-    public const REVERSE_GENDER_TYPES = [
-        'мужской' => 1,
-        'женский' => 2,
-    ];
-
     public static function getWorkExperience(?\DateTimeImmutable $dateStart, ?\DateTimeImmutable $dateEnd = null): float|null
     {
         if (null == $dateStart) {
@@ -325,17 +325,18 @@ class Employee
             $mappedSqlRow['competence'] = $sqlRow['competence'];
             $mappedSqlRow['grade'] = $sqlRow['grade'];
             $mappedSqlRow['status'] = self::STATUS_TYPES[$sqlRow['status']];
-            $mappedSqlRow['date_of_dismissal'] = $sqlRow['status'] === 3 ? (
+            $mappedSqlRow['date_of_dismissal'] = 3 === $sqlRow['status'] ? (
                 null !== $sqlRow['date_of_dismissal'] ? new \DateTimeImmutable($sqlRow['date_of_dismissal']) : null
             ) : null;
-            $mappedSqlRow['reason_of_dismissal'] = $sqlRow['status'] === 3 ? (
+            $mappedSqlRow['reason_of_dismissal'] = 3 === $sqlRow['status'] ? (
                 null !== $sqlRow['reason_of_dismissal'] ? self::REASON_TYPES[$sqlRow['reason_of_dismissal']] : null
             ) : null;
-            $mappedSqlRow['category_of_dismissal'] = $sqlRow['status'] === 3 ? (
+            $mappedSqlRow['category_of_dismissal'] = 3 === $sqlRow['status'] ? (
                 null !== $sqlRow['category_of_dismissal'] ? self::CATEGORY_TYPE[$sqlRow['category_of_dismissal']] : null
             ) : null;
             $mappedSqlRow['workExperience'] = self::getWorkExperience(
-                $mappedSqlRow['date_of_employment'] ?: null, ($mappedSqlRow['date_of_dismissal'] ?: null)
+                $mappedSqlRow['date_of_employment'] ?: null,
+                ($mappedSqlRow['date_of_dismissal'] ?: null)
             ) ?? 0;
 
             $mappedSqlRow['date_of_birth'] = $mappedSqlRow['date_of_birth']?->format('d.m.Y');
@@ -409,6 +410,7 @@ class Employee
                 });
             }
         }
+
         return $mappedSqlArray;
     }
 }

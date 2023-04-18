@@ -10,8 +10,8 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<HiringPlan>
  *
- * @method HiringPlan|null find($id, $lockMode = null, $lockVersion = null)
- * @method HiringPlan|null findOneBy(array $criteria, array $orderBy = null)
+ * @method null|HiringPlan find($id, $lockMode = null, $lockVersion = null)
+ * @method null|HiringPlan findOneBy(array $criteria, array $orderBy = null)
  * @method HiringPlan[]    findAll()
  * @method HiringPlan[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
@@ -47,7 +47,7 @@ class HiringPlanRepository extends ServiceEntityRepository
     {
         $em = $this->getEntityManager();
         $conn = $em->getConnection();
-        $sql = "
+        $sql = '
             select
                 hp.id as id, 
                 hp.status as status, 
@@ -67,11 +67,11 @@ class HiringPlanRepository extends ServiceEntityRepository
                 inner join user_company uc 
                     on mu.id = uc.user_id
                 inner join company c 
-                    on c.id = uc.company_id where c.id in (";
+                    on c.id = uc.company_id where c.id in (';
         foreach ($companies as $company) {
-            $sql .= $company . ",";
+            $sql .= $company.',';
         }
-        $sql = mb_substr($sql, 0, strlen($sql) - 1) . ")";
+        $sql = mb_substr($sql, 0, strlen($sql) - 1).')';
 
         $params = [];
         if (null !== $filter && count($filter) > 0) {
@@ -79,38 +79,38 @@ class HiringPlanRepository extends ServiceEntityRepository
                 if (isset($item['type'])) {
                     $type = $item['type'];
                     if ('text_contains' === $type) {
-                        $sql .= " and lower(hp.".$key.") like :param_".$key;
-                        $params[":param_".$key] = "%".mb_strtolower($item['value'])."%";
+                        $sql .= ' and lower(hp.'.$key.') like :param_'.$key;
+                        $params[':param_'.$key] = '%'.mb_strtolower($item['value']).'%';
                     }
 
                     if ('text_not_contains' === $type) {
-                        $sql .= " and lower(hp.".$key.") not like :param_".$key;
-                        $params[":param_".$key] = "%".mb_strtolower($item['value'])."%";
+                        $sql .= ' and lower(hp.'.$key.') not like :param_'.$key;
+                        $params[':param_'.$key] = '%'.mb_strtolower($item['value']).'%';
                     }
 
                     if ('text_start' === $type) {
-                        $sql .= " and lower(hp.".$key.") like :param_".$key;
-                        $params[":param_".$key] = mb_strtolower($item['value'])."%";
+                        $sql .= ' and lower(hp.'.$key.') like :param_'.$key;
+                        $params[':param_'.$key] = mb_strtolower($item['value']).'%';
                     }
 
                     if ('text_end' === $type) {
-                        $sql .= " and lower(hp.".$key.") like :param_".$key;
-                        $params[":param_".$key] = "%".mb_strtolower($item['value']);
+                        $sql .= ' and lower(hp.'.$key.') like :param_'.$key;
+                        $params[':param_'.$key] = '%'.mb_strtolower($item['value']);
                     }
 
                     if (in_array($type, ['text_accuracy', 'list', 'number_equal'])) {
-                         if ($key === 'manager_name') {
-                             $sql .= " and mu.id = :param_".$key;
-                             $params[":param_".$key] = $item['value'];
-                         } else {
-                             $sql .= " and hp.".$key." = :param_".$key;
-                             $params[":param_".$key] = $item['value'];
-                         }
+                        if ('manager_name' === $key) {
+                            $sql .= ' and mu.id = :param_'.$key;
+                            $params[':param_'.$key] = $item['value'];
+                        } else {
+                            $sql .= ' and hp.'.$key.' = :param_'.$key;
+                            $params[':param_'.$key] = $item['value'];
+                        }
                     }
 
                     if ('number_not_equal' === $type) {
-                        $sql .= " and hp." . $key . " != :param_".$key;
-                        $params[":param_".$key] = $item['value'];
+                        $sql .= ' and hp.'.$key.' != :param_'.$key;
+                        $params[':param_'.$key] = $item['value'];
                     }
 
                     if ('number_inequality' === $type) {
@@ -120,30 +120,29 @@ class HiringPlanRepository extends ServiceEntityRepository
                         if (isset($item['isStrict'])) {
                             if ('' !== $valueFrom && '' === $valueTo) {
                                 if (true === $item['isStrict']) {
-                                    $sql .= " and hp." . $key . " > :param_from".$key;
+                                    $sql .= ' and hp.'.$key.' > :param_from'.$key;
                                 } elseif (false === $item['isStrict']) {
-                                    $sql .= " and hp." . $key . " >= :param_from".$key;
+                                    $sql .= ' and hp.'.$key.' >= :param_from'.$key;
                                 }
-                                $params[":param_from".$key] = $valueFrom;
+                                $params[':param_from'.$key] = $valueFrom;
                             } elseif ('' !== $valueTo && '' === $valueFrom) {
                                 if (true === $item['isStrict']) {
-                                    $sql .= " and hp." . $key . " < :param_to".$key;
+                                    $sql .= ' and hp.'.$key.' < :param_to'.$key;
                                 } else {
-                                    $sql .= " and hp." . $key . " <= :param_to".$key;
+                                    $sql .= ' and hp.'.$key.' <= :param_to'.$key;
                                 }
-                                $params[":param_to".$key] = $valueTo;
+                                $params[':param_to'.$key] = $valueTo;
                             }
                         } elseif ('' !== $valueTo && '' !== $valueFrom) {
                             if (true === $item['isStrict']) {
-                                $sql .= " and hp." . $key . " > :param_from".$key;
-                                $sql .= " and hp." . $key . " < :param_to".$key;
-
+                                $sql .= ' and hp.'.$key.' > :param_from'.$key;
+                                $sql .= ' and hp.'.$key.' < :param_to'.$key;
                             } else {
-                                $sql .= " and hp." . $key . " >= :param_from".$key;
-                                $sql .= " and hp." . $key . " <= :param_to".$key;
+                                $sql .= ' and hp.'.$key.' >= :param_from'.$key;
+                                $sql .= ' and hp.'.$key.' <= :param_to'.$key;
                             }
-                            $params[":param_from".$key] = $valueFrom;
-                            $params[":param_to".$key] = $valueTo;
+                            $params[':param_from'.$key] = $valueFrom;
+                            $params[':param_to'.$key] = $valueTo;
                         }
                     }
                 }
@@ -152,16 +151,17 @@ class HiringPlanRepository extends ServiceEntityRepository
 
         if (null !== $sort) {
             $key = $sort['key'];
-            if ($key === 'manager_name') {
-                $sql .= " order by mu.name " . $sort['value'];
+            if ('manager_name' === $key) {
+                $sql .= ' order by mu.name '.$sort['value'];
             } else {
-                $sql .= " order by hp." . $key . " " . $sort['value'];
+                $sql .= ' order by hp.'.$key.' '.$sort['value'];
             }
         }
 
-        $sql .= " group by mu.id, hp.id";
+        $sql .= ' group by mu.id, hp.id';
 
         $result = $conn->prepare($sql)->executeQuery($params)->fetchAllAssociative();
+
         return HiringPlan::mapSqlArray($result);
     }
 
@@ -172,7 +172,7 @@ class HiringPlanRepository extends ServiceEntityRepository
     {
         $em = $this->getEntityManager();
         $conn = $em->getConnection();
-        $sql = "
+        $sql = '
             select
                 hp.id as id, 
                 hp.status as status, 
@@ -192,17 +192,18 @@ class HiringPlanRepository extends ServiceEntityRepository
                 inner join user_company uc 
                     on mu.id = uc.user_id
                 inner join company c 
-                    on c.id = uc.company_id and c.id in (";
+                    on c.id = uc.company_id and c.id in (';
         foreach ($companies as $company) {
-            $sql .= $company . ",";
+            $sql .= $company.',';
         }
-        $sql = mb_substr($sql, 0, strlen($sql) - 1) . ")";
-        $sql .= " where hp.id = :hpId group by mu.id, hp.id";
+        $sql = mb_substr($sql, 0, strlen($sql) - 1).')';
+        $sql .= ' where hp.id = :hpId group by mu.id, hp.id';
 
         $result = $conn->prepare($sql)->executeQuery(['hpId' => $id])->fetchAllAssociative()[0];
         $result['status'] = (int) $result['status'];
         $result['urgency'] = (int) $result['urgency'];
         $result['manager_name'] = (int) $result['manager_name'];
+
         return $result;
     }
 }

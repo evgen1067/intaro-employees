@@ -7,7 +7,6 @@ use App\Entity\User;
 use App\Repository\HiringPlanRepository;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Exception;
-use JsonException;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -86,16 +85,17 @@ class HiringController extends AbstractController
                     'totalCount' => $listResponse['totalCount'],
                     'data' => $listResponse['items'],
                 ], Response::HTTP_OK);
-            } catch (Exception | JsonException $e) {
+            } catch (Exception|\JsonException $e) {
                 return new JsonResponse([
                     'status' => false,
-                    'data' => $e->getMessage()
+                    'data' => $e->getMessage(),
                 ], Response::HTTP_OK);
             }
         }
+
         return new JsonResponse([
             'status' => false,
-            'data' => 'У вас недостаточно прав.'
+            'data' => 'У вас недостаточно прав.',
         ], Response::HTTP_OK);
     }
 
@@ -122,7 +122,7 @@ class HiringController extends AbstractController
         } catch (Exception $e) {
             return new JsonResponse([
                 'status' => false,
-                'data' => $e->getMessage()
+                'data' => $e->getMessage(),
             ], Response::HTTP_OK);
         }
     }
@@ -150,14 +150,15 @@ class HiringController extends AbstractController
             $hp->fromJson($json)
                 ->addManager($user);
             $repo->save($hp, true);
+
             return new JsonResponse([
                 'status' => true,
-                'data' => 'Запись успешно добавлена.'
+                'data' => 'Запись успешно добавлена.',
             ], Response::HTTP_OK);
-        } catch (JsonException $e) {
+        } catch (\JsonException $e) {
             return new JsonResponse([
                 'status' => false,
-                'data' => $e->getMessage()
+                'data' => $e->getMessage(),
             ], Response::HTTP_OK);
         }
     }
@@ -179,6 +180,7 @@ class HiringController extends AbstractController
                 'message' => 'Пользователь не авторизован.',
             ], Response::HTTP_UNAUTHORIZED);
         }
+
         try {
             $json = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
             $hp = $repo->find($id);
@@ -186,20 +188,21 @@ class HiringController extends AbstractController
                 $hp->fromJson($json)
                     ->addManager($user);
                 $repo->save($hp, true);
+
                 return new JsonResponse([
                     'status' => true,
-                    'data' => 'Запись успешно обновлена.'
+                    'data' => 'Запись успешно обновлена.',
                 ], Response::HTTP_OK);
             } else {
                 return new JsonResponse([
                     'status' => false,
-                    'data' => 'Запись с таким id не найдена.'
+                    'data' => 'Запись с таким id не найдена.',
                 ], Response::HTTP_OK);
             }
-        } catch (JsonException $e) {
+        } catch (\JsonException $e) {
             return new JsonResponse([
                 'status' => false,
-                'data' => $e->getMessage()
+                'data' => $e->getMessage(),
             ], Response::HTTP_OK);
         }
     }
@@ -229,29 +232,30 @@ class HiringController extends AbstractController
             if (null !== $hp) {
                 try {
                     $item = $repo->getRecord($id, $companiesIds);
+
                     return new JsonResponse([
                         'status' => true,
-                        'data' => $item
+                        'data' => $item,
                     ], Response::HTTP_OK);
                 } catch (Exception $e) {
                     return new JsonResponse([
                         'status' => false,
-                        'data' => $e->getMessage()
+                        'data' => $e->getMessage(),
                     ], Response::HTTP_OK);
                 }
             } else {
                 return new JsonResponse([
                     'status' => false,
-                    'data' => 'Запись с таким id не найдена.'
+                    'data' => 'Запись с таким id не найдена.',
                 ], Response::HTTP_OK);
             }
         }
+
         return new JsonResponse([
             'status' => false,
-            'data' => 'У вас недостаточно прав.'
+            'data' => 'У вас недостаточно прав.',
         ], Response::HTTP_OK);
     }
-
 
     #[Route('/delete', methods: ['POST'])]
     public function delete(Request $request, HiringPlanRepository $repo): JsonResponse
@@ -262,16 +266,19 @@ class HiringController extends AbstractController
                 $e = $repo->find($id);
                 if ($e) {
                     $repo->remove($repo->find($id), true);
+
                     continue;
                 }
+
                 return new JsonResponse([
                     'status' => false,
                     'data' => 'Записи не найдены.',
                 ], Response::HTTP_OK);
             }
+
             return new JsonResponse([
                 'status' => true,
-                'data' => 'Записи успешно удалена.'
+                'data' => 'Записи успешно удалена.',
             ], Response::HTTP_OK);
         } catch (\JsonException $e) {
             return new JsonResponse([
