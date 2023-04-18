@@ -1,7 +1,7 @@
 import cloneDeep from 'lodash.clonedeep';
 import { filtersList } from './filters';
 
-export function getEmployeeInformation() {
+export function getHiringInformation(hrManagers, currentId) {
   let urgencies = [
     {
       label: 'низкая',
@@ -42,51 +42,58 @@ export function getEmployeeInformation() {
 
   let hiringPlan = [
     {
+      key: 'manager_name',
+      datatype: 'list',
+      label: 'HR менеджер',
+      listItems: hrManagers,
+    },
+    {
       key: 'status',
       datatype: 'list',
       label: 'Статус позиции',
       listItems: statuses,
     },
     {
-      key: '',
+      key: 'position',
       datatype: 'string',
       label: 'Кто нужен',
     },
     {
-      key: '',
+      key: 'expected_count',
       datatype: 'number',
       label: 'Количество',
     },
     {
-      key: '',
+      key: 'urgency',
       datatype: 'list',
       label: 'Срочность',
       listItems: urgencies,
     },
     {
-      key: '',
+      key: 'director',
       datatype: 'string',
       label: 'Руководитель',
     },
     {
-      key: '',
+      key: 'offers_count',
       datatype: 'number',
       label: 'Сделанные офферы',
     },
     {
-      key: '',
+      key: 'employees_count',
       datatype: 'number',
       label: 'Количество нанятых',
     },
     {
-      key: '',
+      key: 'comment',
       datatype: 'string',
       label: 'Комментарий',
     },
   ];
 
   let columns = [],
-    filter = {};
+    filter = {},
+    defaultItem = {};
 
   for (let i = 0; i < hiringPlan.length; i++) {
     columns.push({
@@ -96,6 +103,14 @@ export function getEmployeeInformation() {
       tdAlign: 'center',
       thAlign: 'center',
     });
+    defaultItem[hiringPlan[i].key] = hiringPlan[i].datatype === 'string' ? '' : 0;
+    if (hiringPlan[i].key === 'status') {
+      defaultItem[hiringPlan[i].key] = 2;
+    } else if (hiringPlan[i].key === 'urgency') {
+      defaultItem[hiringPlan[i].key] = 1;
+    } else if (hiringPlan[i].key === 'manager_name') {
+      defaultItem[hiringPlan[i].key] = currentId;
+    }
     filter[hiringPlan[i].key] =
       hiringPlan[i].datatype !== 'list'
         ? cloneDeep(filtersList[hiringPlan[i].datatype][0])
@@ -107,10 +122,11 @@ export function getEmployeeInformation() {
             listItems: hiringPlan[i].listItems,
           };
   }
-
+  columns.push({ key: 'actions', width: 80, label: 'Действия', tdAlign: 'center', thAlign: 'center'});
   return {
     columns: columns,
     filter: filter,
     dataInfo: hiringPlan,
+    defaultItem: defaultItem,
   };
 }

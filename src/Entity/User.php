@@ -39,10 +39,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Company::class, inversedBy: 'users')]
     private Collection $companies;
 
+    #[ORM\ManyToMany(targetEntity: HiringPlan::class, mappedBy: 'manager')]
+    private Collection $hiringPlans;
+
     public function __construct()
     {
         $this->departments = new ArrayCollection();
         $this->companies = new ArrayCollection();
+        $this->hiringPlans = new ArrayCollection();
     }
 
     public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
@@ -179,6 +183,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeCompany(Company $company): self
     {
         $this->companies->removeElement($company);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, HiringPlan>
+     */
+    public function getHiringPlans(): Collection
+    {
+        return $this->hiringPlans;
+    }
+
+    public function addHiringPlan(HiringPlan $hiringPlan): self
+    {
+        if (!$this->hiringPlans->contains($hiringPlan)) {
+            $this->hiringPlans->add($hiringPlan);
+            $hiringPlan->addManager($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHiringPlan(HiringPlan $hiringPlan): self
+    {
+        if ($this->hiringPlans->removeElement($hiringPlan)) {
+            $hiringPlan->removeManager($this);
+        }
 
         return $this;
     }

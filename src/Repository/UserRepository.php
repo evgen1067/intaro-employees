@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -54,5 +55,30 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
 
         $this->save($user, true);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function names():array
+    {
+        $em = $this->getEntityManager();
+        $conn = $em->getConnection();
+        $sql = "
+        select 
+            distinct 
+            u.id as id,
+            u.name as name
+        from manager_user u
+        order by u.name
+        ";
+        $result = $conn->prepare($sql)->executeQuery([])->fetchAllAssociative();
+        foreach ($result as $row) {
+            $mapped[] = [
+                'listValueId' => $row['id'],
+                'label' => $row['name']
+            ];
+        }
+        return $mapped;
     }
 }

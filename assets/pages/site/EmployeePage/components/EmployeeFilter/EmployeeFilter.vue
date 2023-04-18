@@ -130,7 +130,7 @@
 
 <script>
 import SortIcon from '../SortIcon/SortIcon.vue';
-import { filtersList } from '../../../../helpers/filters';
+import { filtersList } from '../../../../../helpers/filters';
 import { VaDateInput, VaIcon, VaInput, VaSelect } from 'vuestic-ui';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 export default {

@@ -70,11 +70,11 @@
 </template>
 
 <script>
-import { LoadSpinner } from '../../ui';
+import { LoadSpinner } from '../../../ui';
 import { VaButton, VaForm, VaInput, VaSelect } from 'vuestic-ui';
-import { userSymbol } from '../../store';
-import { EmployeeApi, UserApi } from '../../api';
-import { appRoutes } from '../../helpers/constants';
+import { userSymbol } from '../../../store';
+import { EmployeeApi, UserApi } from '../../../api';
+import { appRoutes } from '../../../helpers/constants';
 
 export default {
   name: 'RegisterPage',

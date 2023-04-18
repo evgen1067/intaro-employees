@@ -1,5 +1,5 @@
 import { appRoutes, loginRoute, registerRoute } from '../helpers/constants';
-import { DismissalPage, EmployeePage, NotFoundPage, TurnoverPage, LoginPage, RegisterPage } from '../pages';
+import { DismissalPage, EmployeePage, NotFoundPage, TurnoverPage, LoginPage, RegisterPage, HiringPage } from '../pages';
 import { createRouter, createWebHistory } from 'vue-router';
 import { notFoundRoute } from '../helpers/constants';
 
@@ -18,6 +18,11 @@ const routes = [
     path: appRoutes.turnover.path,
     name: appRoutes.turnover.name,
     component: TurnoverPage,
+  },
+  {
+    path: appRoutes.hiring.path,
+    name: appRoutes.hiring.name,
+    component: HiringPage,
   },
   {
     path: loginRoute.path,

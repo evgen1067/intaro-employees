@@ -1,0 +1,37 @@
+.table-crud-example {
+  --va-form-element-default-width: 0;
+
+  .va-input {
+    display: block;
+  }
+
+  &__slot {
+    th {
+      vertical-align: middle;
+    }
+  }
+}
+
+.modal-crud-example {
+  .va-input {
+    display: block;
+  }
+}
+
+.table-example--pagination {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+.dropdown-menu.show{
+  z-index: 3000;
+}
+.va-dropdown__content{
+  z-index: 2999;
+}
+.number_inequality {
+  max-width: 150px;
+}

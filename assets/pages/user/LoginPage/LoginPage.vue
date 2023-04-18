@@ -14,9 +14,9 @@
 </template>
 
 <script>
-import { LoadSpinner } from '../../ui';
-import { userSymbol } from '../../store';
-import { appRoutes } from '../../helpers/constants';
+import { LoadSpinner } from '../../../ui';
+import { userSymbol } from '../../../store';
+import { appRoutes } from '../../../helpers/constants';
 import { VaButton, VaForm, VaInput } from 'vuestic-ui';
 export default {
   name: 'LoginPage',

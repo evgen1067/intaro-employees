@@ -74,13 +74,13 @@
 </template>
 
 <script>
-import { LoadSpinner } from '../../ui';
-import { EmployeeApi } from '../../api';
-import { getEmployeeInformation } from '../../helpers/employee';
+import { LoadSpinner } from '../../../ui';
+import { EmployeeApi } from '../../../api';
+import { getEmployeeInformation } from '../../../helpers/employee';
 import { cloneDeep } from 'lodash';
 import EmployeeFilter from './components/EmployeeFilter/EmployeeFilter.vue';
 import { VaButton, VaDataTable, VaPagination } from 'vuestic-ui';
-import { userSymbol } from '../../store';
+import { userSymbol } from '../../../store';
 
 export default {
   name: 'EmployeePage',
@@ -245,5 +245,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import './EmployeePage';
+@import 'EmployeePage';
 </style>

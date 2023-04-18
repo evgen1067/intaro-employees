@@ -23,6 +23,14 @@ export const appRoutes = {
       icon: 'bar_chart',
     },
   },
+  hiring: {
+    path: '/hiring',
+    name: 'hiring',
+    title: 'Планы по найму',
+    meta: {
+      icon: 'bar_chart',
+    },
+  },
 };
 
 export const notFoundRoute = {

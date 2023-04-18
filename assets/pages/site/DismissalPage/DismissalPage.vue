@@ -25,21 +25,18 @@
           />
         </div>
       </div>
-      <div class="row mb-3">
+      <div class="row mb-3 col-12">
         <div class="col-2">
-          <info-card :value="turnovers.totalNumber" description="число сотрудников" color="#4056A1" class="h-100" />
+          <info-card :value="dismissals.totalCount" description="число сотрудников" color="#4056A1" class="h-100" />
         </div>
         <div class="col-2">
-          <info-card :value="turnovers.acceptedNumber" description="принято" color="success" class="h-100" />
+          <info-card :value="dismissals.totalAccepted" description="принято" color="success" class="h-100" />
         </div>
         <div class="col-2">
-          <info-card :value="turnovers.dismissedNumber" description="уволено" color="#F13C20" class="h-100" />
+          <info-card description="Уволено" :value="dismissals.totalDismissed" color="#F13C20" class="h-100" />
         </div>
         <div class="col-2">
-          <info-card :value="turnovers.averageNumber" description="Среднеспис. числ." color="#30B5C8" class="h-100" />
-        </div>
-        <div class="col-2">
-          <info-card :value="turnovers.turnoverRate" description="Текучесть" color="#F37A48" class="h-100" />
+          <info-card :value="dismissals.avgWorkExp" description="стаж работы" color="#4056A1" class="h-100" />
         </div>
       </div>
       <div class="row mb-3">
@@ -62,7 +59,7 @@
         <div class="col-12">
           <va-card>
             <va-card-content>
-              <app-chart :data="predictionsChart" type="line" />
+              <app-chart :data="predictionChart" type="line" />
             </va-card-content>
           </va-card>
         </div>
@@ -105,28 +102,27 @@
 </template>
 
 <script>
-import { LoadSpinner, InfoCard, AppChart } from '../../ui';
+import { LoadSpinner, InfoCard, AppChart } from '../../../ui';
 import { VaCard, VaCardContent, VaDateInput } from 'vuestic-ui';
-import { AnalyticsApi } from '../../api';
+import { AnalyticsApi, EmployeeApi } from '../../../api';
 import randomColor from 'randomcolor';
-import { userSymbol } from '../../store';
-
+import { userSymbol } from '../../../store';
 export default {
   name: 'DismissalPage',
   components: { VaCard, VaCardContent, AppChart, InfoCard, VaDateInput, LoadSpinner },
+  inject: {
+    userState: {
+      from: userSymbol,
+    },
+  },
   data: () => ({
     loading: false,
     filter: {
       from: '',
       to: '',
     },
-    turnovers: null,
+    dismissals: null,
   }),
-  inject: {
-    userState: {
-      from: userSymbol,
-    },
-  },
   watch: {
     filter: {
       immediate: true,
@@ -134,7 +130,7 @@ export default {
       async handler() {
         if (!this.loading) {
           this.loading = true;
-          await this.fetchTurnoverData();
+          await this.fetchDismissalData();
           this.loading = false;
         }
       },
@@ -143,7 +139,7 @@ export default {
   async created() {
     this.loading = true;
     await this.defaultFilter();
-    await this.fetchTurnoverData();
+    await this.fetchDismissalData();
     this.loading = false;
   },
   methods: {
@@ -153,8 +149,8 @@ export default {
       this.filter.from = new Date(this.filter.from);
       this.filter.to = new Date();
     },
-    async fetchTurnoverData() {
-      this.turnovers = await AnalyticsApi.getTurnover(this.user.token, this.clearFilter());
+    async fetchDismissalData() {
+      this.dismissals = await AnalyticsApi.getDismissal(this.user.token, this.clearFilter());
     },
     formatFn(date) {
       return date.toLocaleDateString('ru-RU');
@@ -194,7 +190,7 @@ export default {
         hue: 'random',
       });
     },
-    getDismissalChart(data, label = 'Коэффициент текучести') {
+    getDismissalChart(data, label = 'Число увольнений') {
       let colors = this.getColors(data.length),
         chartInfo = {
           labels: [],
@@ -219,51 +215,46 @@ export default {
     user() {
       return this.userState.state.user;
     },
-    genderChart() {
-      if (this.turnovers?.genderChart) {
-        return this.getDismissalChart(this.turnovers.genderChart);
-      } else return null;
-    },
-    workExpChart() {
-      if (this.turnovers?.workExperienceChart) {
-        return this.getDismissalChart(
-          this.turnovers.workExperienceChart,
-          'Коэффициент текучести в зависимости от стажа работы',
-        );
-      } else return null;
-    },
     departmentChart() {
-      if (this.turnovers?.departmentChart) {
-        return this.getDismissalChart(this.turnovers.departmentChart, 'Коэффициент текучести в зависимости от отдела');
+      if (this.dismissals?.departmentChart) {
+        return this.getDismissalChart(this.dismissals.departmentChart, 'Число увольнений в зависимости от отдела');
       } else return null;
     },
     positionChart() {
-      if (this.turnovers?.positionChart) {
-        return this.getDismissalChart(this.turnovers.positionChart, 'Коэффициент текучести в зависимости от должности');
+      if (this.dismissals?.positionChart) {
+        return this.getDismissalChart(this.dismissals.positionChart, 'Число увольнений в зависимости от должности');
       } else return null;
     },
     competenceChart() {
-      if (this.turnovers?.competenceChart) {
-        return this.getDismissalChart(
-          this.turnovers.competenceChart,
-          'Коэффициент текучести в зависимости от компетенции',
-        );
+      if (this.dismissals?.competenceChart) {
+        return this.getDismissalChart(this.dismissals.competenceChart, 'Число увольнений в зависимости от компетенции');
       } else return null;
     },
     gradeChart() {
-      if (this.turnovers?.gradeChart) {
-        return this.getDismissalChart(this.turnovers.gradeChart, 'Коэффициент текучести в зависимости от грейда');
+      if (this.dismissals?.gradeChart) {
+        return this.getDismissalChart(this.dismissals.gradeChart, 'Число увольнений в зависимости от грейда');
       } else return null;
     },
-    predictionsChart() {
-      if (this.turnovers?.predictionsChart) {
-        return this.getDismissalChart(this.turnovers.predictionsChart, 'Прогноз коэффициента текучести');
+    genderChart() {
+      if (this.dismissals?.genderChart) {
+        return this.getDismissalChart(this.dismissals.genderChart);
       } else return null;
+    },
+    workExpChart() {
+      if (this.dismissals?.workExpChart) {
+        return this.getDismissalChart(this.dismissals.workExpChart, 'Число увольнений в зависимости от стажа работы');
+      } else return null;
+    },
+    predictionChart() {
+      if (this.dismissals?.predictions) {
+        return this.getDismissalChart(this.dismissals.predictions, 'Прогноз числа увольнений');
+      }
+      return null;
     },
   },
 };
 </script>
 
 <style scoped>
-@import 'TurnoverPage.scss';
+@import 'DismissalPage.scss';
 </style>
