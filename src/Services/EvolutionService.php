@@ -11,15 +11,20 @@ class EvolutionService
         private ApiService $apiService,
     ) {}
 
+    private array $methods = [
+        'employee' => 'employee',
+        'auth' => 'auth',
+    ];
+
     /**
      * @throws ApiException
      * @throws \JsonException
      */
-    public function getUsers(): array
+    public function getUsers(string $token): array
     {
         $response = $this->apiService->get(
-            $_ENV['EVOLUTION_URL'],
-            ['token' => $_ENV['EVOLUTION_TOKEN']]
+            $this->buildUrl($this->methods['employee'], null),
+            ['token' => $token]
         );
         $jsonResponse = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
         if (isset($jsonResponse['error'])) {
@@ -30,5 +35,31 @@ class EvolutionService
             $data[$key]['company'] = strlen($item['company']) > 0 ? $item['company'] : 'не указано';
         }
         return $data;
+    }
+
+    /**
+     * @throws ApiException
+     * @throws \JsonException
+     */
+    public function auth(): string
+    {
+        $response = $this->apiService->post(
+            $this->buildUrl(
+                $this->methods['auth'],
+                ['username' => $_ENV['EVOLUTION_USERNAME'], 'password' => $_ENV['EVOLUTION_PASSWORD']]
+            ),
+            [],
+            ['Content-Type: application/x-www-form-urlencoded']
+        );
+        $jsonResponse = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
+        if (isset($jsonResponse['status'])) {
+            throw new ApiException($jsonResponse['status']);
+        }
+        return $jsonResponse['token'];
+    }
+
+    private function buildUrl(string $method, array|null $params): string
+    {
+        return $_ENV['EVOLUTION_URL'] . '/' . $method . (null !== $params ? ('?' . http_build_query($params)) : '');
     }
 }

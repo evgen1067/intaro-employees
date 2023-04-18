@@ -33,6 +33,7 @@ class DatabaseImportCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
+            $token = $this->evolutionService->auth();
             $this->employeeRepository->removeAll();
             $this->companyRepository->removeAll();
             $this->departmentRepository->removeAll();
@@ -50,7 +51,7 @@ class DatabaseImportCommand extends Command
             $output->writeln("Данные по сотрудникам успешно загружены из Битрикс24");
             $output->writeln("Сотрудников получено из Битрикс24: " . count($usersBitrix));
 
-            $usersEvolution = $this->evolutionService->getUsers();
+            $usersEvolution = $this->evolutionService->getUsers($token);
             $output->writeln("Данные по сотрудникам успешно загружены из Evolution");
             $output->writeln("Сотрудников получено из Evolution: " . count($usersEvolution));
 
