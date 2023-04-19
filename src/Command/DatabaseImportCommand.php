@@ -34,18 +34,25 @@ class DatabaseImportCommand extends Command
     {
         try {
             $token = $this->evolutionService->auth();
-            $this->employeeRepository->removeAll();
-            $this->companyRepository->removeAll();
-            $this->departmentRepository->removeAll();
             $departmentsBitrix = $this->bitrixService->getDepartments();
             foreach ($departmentsBitrix as $id => $departmentBitrix) {
-                $departmentsBitrix[$id] = new Department(trim($departmentBitrix));
+                $dbResult = $this->departmentRepository->findOneBy(['bitrixId' => $id]);
+                if (!empty($dbResult) && $dbResult->getName() === trim($departmentBitrix)) {
+                    $departmentsBitrix[$id] = $dbResult;
+                    continue;
+                }
+                $departmentsBitrix[$id] = new Department((int) $id, trim($departmentBitrix));
                 $this->departmentRepository->save($departmentsBitrix[$id], true);
             }
             $output->writeln('Данные по отделам успешно загружены из Битрикс24');
 
-            $emptyDepartment = new Department('не указано');
-            $this->departmentRepository->save($emptyDepartment, true);
+            $dbResult = $this->departmentRepository->findOneBy(['bitrixId' => 0]);
+            if (empty($dbResult) || $dbResult->getName() !== 'Не указано') {
+                $emptyDepartment = new Department(0, 'Не указано');
+                $this->departmentRepository->save($emptyDepartment, true);
+            } else {
+                $emptyDepartment = $dbResult;
+            }
 
             $usersBitrix = $this->bitrixService->getUsers();
             $output->writeln('Данные по сотрудникам успешно загружены из Битрикс24');
@@ -71,13 +78,21 @@ class DatabaseImportCommand extends Command
                     ) ? $userEvo['company'] : 'Не указано';
 
                     if (!isset($companies[$companyKey])) {
-                        $companies[$companyKey] = new Company($companyKey);
-                        $this->companyRepository->save($companies[$companyKey], true);
+                        $dbResult = $this->companyRepository->findOneBy(['name' => $companyKey]);
+                        if (empty($dbResult)) {
+                            $companies[$companyKey] = new Company($companyKey);
+                            $this->companyRepository->save($companies[$companyKey], true);
+                        } else {
+                            $companies[$companyKey] = $dbResult;
+                        }
                     }
 
                     $usersBitrix[$index]['company'] = $companies[$companyKey];
                     $usersBitrix[$index]['competence'] = strlen($userEvo['competence']) > 0 ? $userEvo['competence'] : 'Не указано';
                     $usersBitrix[$index]['grade'] = strlen($userEvo['grade']) > 0 ? $userEvo['grade'] : 'не указано';
+
+                    $bitrixId = (int) $usersBitrix[$index]['id'];
+                    $evoId = (int) $userEvo['id'];
 
                     $employee = new Employee();
                     $employee
@@ -89,21 +104,31 @@ class DatabaseImportCommand extends Command
                         ->setStatus($usersBitrix[$index]['status'])
                         ->setCompany($usersBitrix[$index]['company'])
                         ->setCompetence($usersBitrix[$index]['competence'])
-                        ->setGrade($usersBitrix[$index]['grade']);
+                        ->setGrade($usersBitrix[$index]['grade'])
+                        ->setBitrixId($bitrixId)
+                        ->setEvoId($evoId);
                     if (3 === $employee->getStatus()) {
                         $employee->setDateOfDismissal($usersBitrix[$index]['dateOfDismissal']);
                     }
                     foreach ($usersBitrix[$index]['departments'] as $userDepartment) {
-                        if (isset($notSaved[$userDepartment])) {
-                            continue;
-                        }
                         $employee->addDepartment($departmentsBitrix[$userDepartment]);
                     }
                     // проверки на пустоту отделов и компаний
                     if (0 === count($usersBitrix[$index]['departments']) || !isset($usersBitrix[$index]['departments'])) {
                         $employee->addDepartment($emptyDepartment);
                     }
-                    $this->employeeRepository->save($employee, true);
+
+                    $dbResult = $this->employeeRepository->findOneBy(['evoId' => $evoId, 'bitrixId' => $bitrixId]);
+                    if (empty($dbResult)) {
+                        $this->employeeRepository->save($employee, true);
+                    } else {
+                        $flag = Employee::compareEmployees($dbResult, $employee);
+                        if ($flag) {
+                            continue;
+                        }
+                        $dbResult->updateEmployee($employee);
+                        $this->employeeRepository->save($dbResult, true);
+                    }
                 }
             }
             $output->writeln('В БД загружены данные по '.$count.' сотрудникам');

@@ -118,6 +118,12 @@ class Employee
     #[ORM\Column(length: 500)]
     private ?string $grade = null;
 
+    #[ORM\Column]
+    private ?int $bitrixId = null;
+
+    #[ORM\Column]
+    private ?int $evoId = null;
+
     public function __construct()
     {
         $this->departments = new ArrayCollection();
@@ -412,5 +418,85 @@ class Employee
         }
 
         return $mappedSqlArray;
+    }
+
+    public function getBitrixId(): ?int
+    {
+        return $this->bitrixId;
+    }
+
+    public function setBitrixId(int $bitrixId): self
+    {
+        $this->bitrixId = $bitrixId;
+
+        return $this;
+    }
+
+    public function getEvoId(): ?int
+    {
+        return $this->evoId;
+    }
+
+    public function setEvoId(int $evoId): self
+    {
+        $this->evoId = $evoId;
+
+        return $this;
+    }
+
+    public static function compareEmployees(Employee $old, Employee $new): bool
+    {
+        $checkStandardField =
+            $old->getName() === $new->getName() &&
+            $old->getGender() && $new->getGender() &&
+            $old->getDateOfBirth() && $new->getDateOfBirth() &&
+            $old->getDateOfEmployment() && $new->getDateOfEmployment() &&
+            $old->getPosition() && $new->getPosition() &&
+            $old->getStatus() && $new->getStatus() &&
+            $old->getDateOfDismissal() && $new->getDateOfDismissal() &&
+            $old->getReasonOfDismissal() && $new->getReasonOfDismissal() &&
+            $old->getCategoryOfDismissal() && $new->getCategoryOfDismissal() &&
+            $old->getCompetence() && $new->getCompetence() &&
+            $old->getGrade() && $new->getGrade();
+        if ($checkStandardField) {
+            // departments
+            $oldDepartments = $old->getDepartments()->toArray();
+            $newDepartments = $new->getDepartments()->toArray();
+            if (count($oldDepartments) !== count($newDepartments)) {
+                return false;
+            }
+            $oldIds = array_column($oldDepartments, 'bitrixId');
+            $newIds = array_column($newDepartments, 'bitrixId');
+            foreach ($oldIds as $oldId) {
+                if (!in_array($oldId, $newIds)) {
+                    return false;
+                }
+            }
+            $oldCompany = $old->getCompany();
+            $newCompany = $new->getCompany();
+            if ($oldCompany->getName() !== $newCompany->getName()) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public function updateEmployee(Employee $new): self
+    {
+        $this
+            ->setName($new->getName())
+            ->setGender($new->getGender())
+            ->setDateOfBirth($new->getDateOfBirth())
+            ->setDateOfEmployment($new->getDateOfEmployment())
+            ->setPosition($new->getPosition())
+            ->setStatus($new->getStatus())
+            ->setDateOfDismissal($new->getDateOfDismissal())
+            ->setReasonOfDismissal($new->getReasonOfDismissal())
+            ->setCategoryOfDismissal($new->getCategoryOfDismissal())
+            ->setCompetence($new->getCompetence())
+            ->setGrade($new->getGrade());
+
+        return $this;
     }
 }

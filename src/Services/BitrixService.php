@@ -45,6 +45,7 @@ class BitrixService
         $usersList = [];
         foreach ($usersBitrix as $u) {
             $usersList[] = [
+                'id' => $u['ID'],
                 'name' => $u['LAST_NAME'].' '.$u['NAME'].' '.($this->checkField($u, 'SECOND_NAME') ? $u['SECOND_NAME'] : ''),
                 'gender' => $this->checkField($u, 'PERSONAL_GENDER') ? ('M' === $u['PERSONAL_GENDER'] ? 1 : 2) : 3,
                 'dateOfBirth' => $this->checkField($u, 'PERSONAL_BIRTHDAY') ? new \DateTimeImmutable($u['PERSONAL_BIRTHDAY']) : null,

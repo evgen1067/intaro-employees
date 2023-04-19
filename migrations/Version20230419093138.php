@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230414134340 extends AbstractMigration
+final class Version20230419093138 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -23,14 +23,19 @@ final class Version20230414134340 extends AbstractMigration
         $this->addSql('CREATE SEQUENCE company_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE department_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE employee_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE hiring_plan_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE "manager_user_id_seq" INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE TABLE company (id INT NOT NULL, name VARCHAR(500) NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE TABLE department (id INT NOT NULL, name VARCHAR(500) NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE TABLE employee (id INT NOT NULL, company_id INT NOT NULL, name VARCHAR(500) NOT NULL, gender SMALLINT NOT NULL, date_of_birth DATE DEFAULT NULL, date_of_employment DATE DEFAULT NULL, position VARCHAR(500) NOT NULL, status SMALLINT NOT NULL, date_of_dismissal DATE DEFAULT NULL, reason_of_dismissal SMALLINT DEFAULT NULL, category_of_dismissal SMALLINT DEFAULT NULL, competence VARCHAR(500) NOT NULL, grade VARCHAR(500) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE department (id INT NOT NULL, name VARCHAR(500) NOT NULL, bitrix_id INT NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE employee (id INT NOT NULL, company_id INT NOT NULL, name VARCHAR(500) NOT NULL, gender SMALLINT NOT NULL, date_of_birth DATE DEFAULT NULL, date_of_employment DATE DEFAULT NULL, position VARCHAR(500) NOT NULL, status SMALLINT NOT NULL, date_of_dismissal DATE DEFAULT NULL, reason_of_dismissal SMALLINT DEFAULT NULL, category_of_dismissal SMALLINT DEFAULT NULL, competence VARCHAR(500) NOT NULL, grade VARCHAR(500) NOT NULL, bitrix_id INT NOT NULL, evo_id INT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_5D9F75A1979B1AD6 ON employee (company_id)');
         $this->addSql('CREATE TABLE employee_department (employee_id INT NOT NULL, department_id INT NOT NULL, PRIMARY KEY(employee_id, department_id))');
         $this->addSql('CREATE INDEX IDX_55CA515E8C03F15C ON employee_department (employee_id)');
         $this->addSql('CREATE INDEX IDX_55CA515EAE80F5DF ON employee_department (department_id)');
+        $this->addSql('CREATE TABLE hiring_plan (id INT NOT NULL, position VARCHAR(512) NOT NULL, expected_count INT NOT NULL, director VARCHAR(512) NOT NULL, offers_count INT NOT NULL, employees_count INT NOT NULL, comment TEXT DEFAULT NULL, status SMALLINT NOT NULL, urgency SMALLINT NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE hiring_plan_user (hiring_plan_id INT NOT NULL, user_id INT NOT NULL, PRIMARY KEY(hiring_plan_id, user_id))');
+        $this->addSql('CREATE INDEX IDX_9E1D4332A6E6B99 ON hiring_plan_user (hiring_plan_id)');
+        $this->addSql('CREATE INDEX IDX_9E1D4332A76ED395 ON hiring_plan_user (user_id)');
         $this->addSql('CREATE TABLE "manager_user" (id INT NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, name VARCHAR(500) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_8B9A7430E7927C74 ON "manager_user" (email)');
         $this->addSql('CREATE TABLE user_department (user_id INT NOT NULL, department_id INT NOT NULL, PRIMARY KEY(user_id, department_id))');
@@ -54,6 +59,8 @@ final class Version20230414134340 extends AbstractMigration
         $this->addSql('ALTER TABLE employee ADD CONSTRAINT FK_5D9F75A1979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE employee_department ADD CONSTRAINT FK_55CA515E8C03F15C FOREIGN KEY (employee_id) REFERENCES employee (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE employee_department ADD CONSTRAINT FK_55CA515EAE80F5DF FOREIGN KEY (department_id) REFERENCES department (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE hiring_plan_user ADD CONSTRAINT FK_9E1D4332A6E6B99 FOREIGN KEY (hiring_plan_id) REFERENCES hiring_plan (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE hiring_plan_user ADD CONSTRAINT FK_9E1D4332A76ED395 FOREIGN KEY (user_id) REFERENCES "manager_user" (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE user_department ADD CONSTRAINT FK_6A7A2766A76ED395 FOREIGN KEY (user_id) REFERENCES "manager_user" (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE user_department ADD CONSTRAINT FK_6A7A2766AE80F5DF FOREIGN KEY (department_id) REFERENCES department (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE user_company ADD CONSTRAINT FK_17B21745A76ED395 FOREIGN KEY (user_id) REFERENCES "manager_user" (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -67,10 +74,13 @@ final class Version20230414134340 extends AbstractMigration
         $this->addSql('DROP SEQUENCE company_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE department_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE employee_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE hiring_plan_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE "manager_user_id_seq" CASCADE');
         $this->addSql('ALTER TABLE employee DROP CONSTRAINT FK_5D9F75A1979B1AD6');
         $this->addSql('ALTER TABLE employee_department DROP CONSTRAINT FK_55CA515E8C03F15C');
         $this->addSql('ALTER TABLE employee_department DROP CONSTRAINT FK_55CA515EAE80F5DF');
+        $this->addSql('ALTER TABLE hiring_plan_user DROP CONSTRAINT FK_9E1D4332A6E6B99');
+        $this->addSql('ALTER TABLE hiring_plan_user DROP CONSTRAINT FK_9E1D4332A76ED395');
         $this->addSql('ALTER TABLE user_department DROP CONSTRAINT FK_6A7A2766A76ED395');
         $this->addSql('ALTER TABLE user_department DROP CONSTRAINT FK_6A7A2766AE80F5DF');
         $this->addSql('ALTER TABLE user_company DROP CONSTRAINT FK_17B21745A76ED395');
@@ -79,6 +89,8 @@ final class Version20230414134340 extends AbstractMigration
         $this->addSql('DROP TABLE department');
         $this->addSql('DROP TABLE employee');
         $this->addSql('DROP TABLE employee_department');
+        $this->addSql('DROP TABLE hiring_plan');
+        $this->addSql('DROP TABLE hiring_plan_user');
         $this->addSql('DROP TABLE "manager_user"');
         $this->addSql('DROP TABLE user_department');
         $this->addSql('DROP TABLE user_company');

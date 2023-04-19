@@ -24,8 +24,12 @@ class Department
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'departments')]
     private Collection $users;
 
-    public function __construct(string $name)
+    #[ORM\Column]
+    private ?int $bitrixId = null;
+
+    public function __construct(int $id, string $name)
     {
+        $this->bitrixId = $id;
         $this->name = $name;
         $this->employees = new ArrayCollection();
         $this->users = new ArrayCollection();
@@ -98,6 +102,18 @@ class Department
         if ($this->users->removeElement($user)) {
             $user->removeDepartment($this);
         }
+
+        return $this;
+    }
+
+    public function getBitrixId(): ?int
+    {
+        return $this->bitrixId;
+    }
+
+    public function setBitrixId(int $bitrixId): self
+    {
+        $this->bitrixId = $bitrixId;
 
         return $this;
     }
