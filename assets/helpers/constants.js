@@ -38,6 +38,11 @@ export const notFoundRoute = {
   name: 'notfound',
 };
 
+export const errorRoute = {
+  path: '/error',
+  name: 'error',
+}
+
 export const loginRoute = {
   path: '/login',
   name: 'login',

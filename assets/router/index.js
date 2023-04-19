@@ -1,43 +1,56 @@
-import { appRoutes, loginRoute, registerRoute } from '../helpers/constants';
-import { DismissalPage, EmployeePage, NotFoundPage, TurnoverPage, LoginPage, RegisterPage, HiringPage } from '../pages';
+import { appRoutes, loginRoute, registerRoute, notFoundRoute, errorRoute } from '../helpers/constants';
+import {
+  DismissalPage,
+  EmployeePage,
+  TurnoverPage,
+  LoginPage,
+  RegisterPage,
+  HiringPage,
+  NotFoundPage,
+  ErrorPage,
+} from '../pages';
 import { createRouter, createWebHistory } from 'vue-router';
-import { notFoundRoute } from '../helpers/constants';
-
+import { defineComponent } from 'vue';
 const routes = [
   {
     path: appRoutes.employee.path,
     name: appRoutes.employee.name,
-    component: EmployeePage,
+    component: defineComponent(EmployeePage),
   },
   {
     path: appRoutes.dismissal.path,
     name: appRoutes.dismissal.name,
-    component: DismissalPage,
+    component: defineComponent(DismissalPage),
   },
   {
     path: appRoutes.turnover.path,
     name: appRoutes.turnover.name,
-    component: TurnoverPage,
+    component: defineComponent(TurnoverPage),
   },
   {
     path: appRoutes.hiring.path,
     name: appRoutes.hiring.name,
-    component: HiringPage,
+    component: defineComponent(HiringPage),
   },
   {
     path: loginRoute.path,
     name: loginRoute.name,
-    component: LoginPage,
+    component: defineComponent(LoginPage),
   },
   {
     path: registerRoute.path,
     name: registerRoute.name,
-    component: RegisterPage,
+    component: defineComponent(RegisterPage),
+  },
+  {
+    path: errorRoute.path,
+    name: errorRoute.name,
+    component: defineComponent(ErrorPage),
   },
   {
     path: notFoundRoute.path,
     name: notFoundRoute.name,
-    component: NotFoundPage,
+    component: defineComponent(NotFoundPage),
   },
 ];
 

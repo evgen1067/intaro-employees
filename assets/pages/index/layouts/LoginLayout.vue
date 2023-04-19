@@ -38,5 +38,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../MainIndex';
+@import '../index';
 </style>

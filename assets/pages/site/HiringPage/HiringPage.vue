@@ -113,6 +113,7 @@ import { LoadSpinner } from '../../../ui';
 import { cloneDeep } from 'lodash';
 import { HiringApi } from '../../../api';
 import { getHiringInformation } from '../../../helpers/hiring';
+import { errorRoute } from '../../../helpers/constants';
 export default {
   name: 'HiringPage',
   inject: {
@@ -194,7 +195,7 @@ export default {
       this.table.columns = hiringPlan.columns;
       await this.fetchData();
     } else {
-      // TODO ERROR 500
+      this.$router.push({ name: errorRoute.name });
     }
   },
   methods: {
@@ -255,6 +256,7 @@ export default {
         this.table.total = result.totalCount;
       } else {
         this.toast(result.data, 'danger');
+        this.$router.push({ name: errorRoute.name });
       }
       this.loading = false;
     },

@@ -55,7 +55,10 @@ class AnalyticsController extends AbstractController
         $analytics = new AnalyticsService($valueFrom, $valueTo, $em);
 
         try {
-            return new JsonResponse($analytics->getDismissal($roleFilters), Response::HTTP_OK);
+            return new JsonResponse([
+                'status' => true,
+                'data' => $analytics->getDismissal($roleFilters),
+            ], Response::HTTP_OK);
         } catch (Exception|\Exception $e) {
             return new JsonResponse([
                 'status' => false,
@@ -104,7 +107,10 @@ class AnalyticsController extends AbstractController
         $analytics = new AnalyticsService($valueFrom, $valueTo, $em);
 
         try {
-            return new JsonResponse($analytics->getTurnover($roleFilters), Response::HTTP_OK);
+            return new JsonResponse([
+                'status' => true,
+                'data' => $analytics->getTurnover($roleFilters),
+            ], Response::HTTP_OK);
         } catch (Exception|\Exception $e) {
             return new JsonResponse([
                 'status' => false,

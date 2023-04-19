@@ -1,22 +1,20 @@
 <template>
   <template v-if="!loading">
-    <not-found-layout v-if="routeName === notFoundRouteName" />
-    <login-layout v-else-if="routeName === loginRouteName || routeName === registerRouteName" />
+    <error-layout v-if="[notFoundRouteName, errorRouteName].includes(routeName)" />
+    <login-layout v-else-if="[registerRouteName, loginRouteName].includes(routeName)" />
     <standard-layout v-else />
   </template>
   <load-spinner v-else />
 </template>
 
 <script>
-import NotFoundLayout from './Layouts/NotFoundLayout.vue';
-import { loginRoute, notFoundRoute, registerRoute } from '../../helpers/constants';
-import StandardLayout from './Layouts/StandardLayout.vue';
-import LoginLayout from './Layouts/LoginLayout.vue';
-import LoadSpinner from '../../ui/spinner/LoadSpinner.vue';
+import { ErrorLayout, StandardLayout, LoginLayout } from './layouts';
+import { errorRoute, loginRoute, notFoundRoute, registerRoute } from '../../helpers/constants';
+import { LoadSpinner } from '../../ui';
 import { userSymbol } from '../../store';
 export default {
   name: 'MainIndex',
-  components: { LoadSpinner, LoginLayout, StandardLayout, NotFoundLayout },
+  components: { LoadSpinner, LoginLayout, StandardLayout, ErrorLayout },
   data: () => ({
     loading: true,
   }),
@@ -50,6 +48,9 @@ export default {
     notFoundRouteName() {
       return notFoundRoute.name;
     },
+    errorRouteName() {
+      return errorRoute.name;
+    },
     routeName() {
       return this.$route.name;
     },
@@ -60,6 +61,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-@import './MainIndex';
-</style>
+<style lang="scss" scoped></style>

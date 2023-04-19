@@ -81,6 +81,7 @@ import { cloneDeep } from 'lodash';
 import EmployeeFilter from './components/EmployeeFilter/EmployeeFilter.vue';
 import { VaButton, VaDataTable, VaPagination } from 'vuestic-ui';
 import { userSymbol } from '../../../store';
+import { errorRoute } from '../../../helpers/constants';
 
 export default {
   name: 'EmployeePage',
@@ -130,6 +131,9 @@ export default {
       EmployeeApi.getCompetences(this.user.token),
       EmployeeApi.getGrades(this.user.token),
     ]);
+    if (!result[0].status || !result[1].status || !result[2].status || !result[3].status || !result[4].status) {
+      this.$router.push({ name: errorRoute.name });
+    }
     this.employee = getEmployeeInformation(
       result[0].data,
       result[1].data,
@@ -168,10 +172,16 @@ export default {
         page: this.pagination.page,
         limit: this.pagination.limit,
       });
-      this.table.total = result.totalCount;
-      this.table.items.options = result.data;
-      await this.mapTableData();
-      this.tableLoading = false;
+      if (!result.status) {
+        this.toast(result.data, 'danger');
+        this.$router.push({ name: errorRoute.name });
+      } else {
+        this.toast('Данные загружены', 'success');
+        this.table.total = result.totalCount;
+        this.table.items.options = result.data;
+        await this.mapTableData();
+        this.tableLoading = false;
+      }
     },
     async changeFilter(e) {
       this.filter.filter[e.key] = cloneDeep(e.filter);
@@ -228,6 +238,13 @@ export default {
           object[key] = row[key];
         });
         this.table.items.selected.push(object);
+      });
+    },
+    toast(message, color) {
+      this.$vaToast.init({
+        message: message,
+        color: color,
+        position: 'bottom-right',
       });
     },
   },

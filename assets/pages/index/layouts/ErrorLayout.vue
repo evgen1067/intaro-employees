@@ -12,10 +12,10 @@
 
 <script>
 export default {
-  name: 'NotFoundLayout',
+  name: 'ErrorLayout',
 };
 </script>
 
 <style lang="scss" scoped>
-@import '../MainIndex';
+@import '../index';
 </style>

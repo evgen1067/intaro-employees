@@ -110,6 +110,7 @@ import { VaCard, VaCardContent, VaDateInput } from 'vuestic-ui';
 import { AnalyticsApi } from '../../../api';
 import randomColor from 'randomcolor';
 import { userSymbol } from '../../../store';
+import { errorRoute } from '../../../helpers/constants';
 
 export default {
   name: 'DismissalPage',
@@ -133,28 +134,32 @@ export default {
       deep: true,
       async handler() {
         if (!this.loading) {
-          this.loading = true;
           await this.fetchTurnoverData();
-          this.loading = false;
         }
       },
     },
   },
-  async created() {
-    this.loading = true;
-    await this.defaultFilter();
-    await this.fetchTurnoverData();
-    this.loading = false;
+  created() {
+    this.defaultFilter();
   },
   methods: {
     async defaultFilter() {
-      this.filter.from = new Date();
-      this.filter.from = this.filter.from.setMonth(this.filter.from.getMonth() - 12);
-      this.filter.from = new Date(this.filter.from);
-      this.filter.to = new Date();
+      this.filter = {
+        from: (new Date()).setMonth(this.filter.from.getMonth() - 12),
+        to: new Date(),
+      };
     },
     async fetchTurnoverData() {
-      this.turnovers = await AnalyticsApi.getTurnover(this.user.token, this.clearFilter());
+      this.loading = true;
+      const result = await AnalyticsApi.getTurnover(this.user.token, this.clearFilter());
+      if (result.status) {
+        this.turnovers = result.data;
+        this.toast('Данные загружены', 'success');
+      } else {
+        this.toast(result.data, 'danger');
+        this.$router.push({ name: errorRoute.name });
+      }
+      this.loading = false;
     },
     formatFn(date) {
       return date.toLocaleDateString('ru-RU');
@@ -213,6 +218,13 @@ export default {
         chartInfo.datasets[0].data.push(data[i].value);
       }
       return chartInfo;
+    },
+    toast(message, color) {
+      this.$vaToast.init({
+        message: message,
+        color: color,
+        position: 'bottom-right',
+      });
     },
   },
   computed: {
