@@ -25,7 +25,10 @@ class AdminCreateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $user = new User();
+        $user = $this->repo->findOneBy(['email' => $_ENV['ADMIN_EMAIL']]);
+        if (null == $user) {
+            $user = new User();
+        }
         $companies = $this->companyRepository->findAll();
         foreach ($companies as $company) {
             $user->addCompany($company);
